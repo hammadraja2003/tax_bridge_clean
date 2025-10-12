@@ -1,0 +1,387 @@
+{
+	"info": {
+		"_postman_id": "2d2a1b85-8c8e-4d80-ad0a-54961095c4b0",
+		"name": "PRAL",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "28024522",
+		"_collection_link": "https://restless-station-789771.postman.co/workspace/GRC-Workspace~cbc77036-7713-4e2e-87ee-688a36fc3350/collection/28024522-2d2a1b85-8c8e-4d80-ad0a-54961095c4b0?action=share&source=collection_link&creator=28024522"
+	},
+	"item": [
+		{
+			"name": "validating invoice data SN018",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"invoiceType\": \"Sale Invoice\",\r\n  \"invoiceDate\": \"2025-08-13\",\r\n  \"sellerNTNCNIC\": \"8923980\",\r\n  \"sellerBusinessName\": \"SECUREISM (PRIVATE) LIMITED\",\r\n  \"sellerProvince\": \"Punjab\",\r\n  \"sellerAddress\": \"F3 Center of Technology, Zaraj Society, Islamabad Pakistan\",\r\n  \"buyerNTNCNIC\": \"\",\r\n  \"buyerBusinessName\": \"F3 Technologies (Pvt) Ltd\",\r\n  \"buyerProvince\": \"Punjab\",\r\n  \"buyerAddress\": \"2nd Floor, Arfa Software Tech Park, Lahore\",\r\n  \"buyerRegistrationType\": \"Unregistered\",\r\n  \"invoiceRefNo\": \"\",\r\n  \"scenarioId\": \"SN018\",\r\n  \"items\": [\r\n    {\r\n      \"hsCode\": \"9815.6000\",\r\n      \"productDescription\": \"API Integration Services\",\r\n      \"rate\": \"16%\",\r\n      \"uoM\": \"Per Month\",\r\n      \"quantity\": 1,\r\n      \"totalValues\": 11600.0,\r\n      \"valueSalesExcludingST\": 10000.0,\r\n      \"fixedNotifiedValueOrRetailPrice\": 0,\r\n      \"salesTaxApplicable\": 1600.0,\r\n      \"salesTaxWithheldAtSource\": 0.0,\r\n      \"extraTax\": \"\",\r\n      \"furtherTax\": 0.0,\r\n      \"sroScheduleNo\": \"\",\r\n      \"fedPayable\": 0.0,\r\n      \"discount\": 0.0,\r\n      \"saleType\": \"Services (FED in ST Mode)\",\r\n      \"sroItemSerialNo\": \"\"\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/di_data/v1/di/validateinvoicedata_sb"
+			},
+			"response": []
+		},
+		{
+			"name": "validating invoice data SN019",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"invoiceType\": \"Sale Invoice\",\r\n  \"invoiceDate\": \"2025-07-25\",\r\n  \"sellerNTNCNIC\": \"8923980\",\r\n  \"sellerBusinessName\": \"SECUREISM (PRIVATE) LIMITED\",\r\n  \"sellerProvince\": \"Punjab\",\r\n  \"sellerAddress\": \"F3 Center of Technology, Zaraj Society, Islamabad Pakistan\",\r\n  \"buyerNTNCNIC\": \"\",\r\n  \"buyerBusinessName\": \"XYZ Enterprises\",\r\n  \"buyerProvince\": \"Sindh\",\r\n  \"buyerAddress\": \"Karachi, Sindh\",\r\n  \"buyerRegistrationType\": \"Unregistered\",\r\n  \"invoiceRefNo\": \"\",\r\n  \"scenarioId\": \"SN019\",\r\n  \"items\": [\r\n    {\r\n      \"hsCode\": \"9815.6000\",\r\n      \"productDescription\": \"API Integration Services\",\r\n      \"rate\": \"16%\",\r\n      \"uoM\": \"Per Month\",\r\n      \"quantity\": 1,\r\n      \"totalValues\": 11600,\r\n      \"valueSalesExcludingST\": 10000,\r\n      \"fixedNotifiedValueOrRetailPrice\": 0,\r\n      \"salesTaxApplicable\": 1600,\r\n      \"salesTaxWithheldAtSource\": 0,\r\n      \"extraTax\": \"\",\r\n      \"furtherTax\": 0,\r\n      \"sroScheduleNo\": \"\",\r\n      \"fedPayable\": 1600,\r\n      \"discount\": 0,\r\n      \"saleType\": \"Services\",\r\n      \"sroItemSerialNo\": \"\"\r\n    }\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/di_data/v1/di/validateinvoicedata_sb"
+			},
+			"response": []
+		},
+		{
+			"name": "posting invoice data scenario 18",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"invoiceType\": \"Sale Invoice\",\r\n  \"invoiceDate\": \"2025-07-25\",\r\n  \"sellerNTNCNIC\": \"8923980\",\r\n  \"sellerBusinessName\": \"SECUREISM (PRIVATE) LIMITED\",\r\n  \"sellerProvince\": \"Punjab\",\r\n  \"sellerAddress\": \"F3 Center of Technology, Zaraj Society, Islamabad Pakistan\",\r\n  \"buyerNTNCNIC\": \"\",\r\n  \"buyerBusinessName\": \"XYZ Enterprises\",\r\n  \"buyerProvince\": \"Sindh\",\r\n  \"buyerAddress\": \"Karachi, Sindh\",\r\n  \"buyerRegistrationType\": \"Unregistered\",\r\n  \"invoiceRefNo\": \"\",\r\n  \"scenarioId\": \"SN018\",\r\n  \"items\": [\r\n    {\r\n      \"hsCode\": \"9815.6000\",\r\n      \"productDescription\": \"API Integration Services\",\r\n      \"rate\": \"16%\",\r\n      \"uoM\": \"Per Month\",\r\n      \"quantity\": 1,\r\n      \"totalValues\": 11600,\r\n      \"valueSalesExcludingST\": 10000,\r\n      \"fixedNotifiedValueOrRetailPrice\": 0,\r\n      \"salesTaxApplicable\": 1600,\r\n      \"salesTaxWithheldAtSource\": 0,\r\n      \"extraTax\": \"\",\r\n      \"furtherTax\": 0,\r\n      \"sroScheduleNo\": \"\",\r\n      \"fedPayable\": 1600,\r\n      \"discount\": 0,\r\n      \"saleType\": \"Services (FED in ST Mode)\",\r\n      \"sroItemSerialNo\": \"\"\r\n    }\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/di_data/v1/di/postinvoicedata_sb"
+			},
+			"response": []
+		},
+		{
+			"name": "posting invoice data scenario 19",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"invoiceType\": \"Sale Invoice\",\r\n  \"invoiceDate\": \"2025-07-25\",\r\n  \"sellerNTNCNIC\": \"8923980\",\r\n  \"sellerBusinessName\": \"SECUREISM (PRIVATE) LIMITED\",\r\n  \"sellerProvince\": \"Punjab\",\r\n  \"sellerAddress\": \"F3 Center of Technology, Zaraj Society, Islamabad Pakistan\",\r\n  \"buyerNTNCNIC\": \"\",\r\n  \"buyerBusinessName\": \"XYZ Enterprises\",\r\n  \"buyerProvince\": \"Sindh\",\r\n  \"buyerAddress\": \"Karachi, Sindh\",\r\n  \"buyerRegistrationType\": \"Unregistered\",\r\n  \"invoiceRefNo\": \"\",\r\n  \"scenarioId\": \"SN019\",\r\n  \"items\": [\r\n    {\r\n      \"hsCode\": \"9815.6000\",\r\n      \"productDescription\": \"API Integration Services\",\r\n      \"rate\": \"16%\",\r\n      \"uoM\": \"Per Month\",\r\n      \"quantity\": 1,\r\n      \"totalValues\": 11600,\r\n      \"valueSalesExcludingST\": 10000,\r\n      \"fixedNotifiedValueOrRetailPrice\": 0,\r\n      \"salesTaxApplicable\": 1600,\r\n      \"salesTaxWithheldAtSource\": 0,\r\n      \"extraTax\": \"\",\r\n      \"furtherTax\": 0,\r\n      \"sroScheduleNo\": \"\",\r\n      \"fedPayable\": 1600,\r\n      \"discount\": 0,\r\n      \"saleType\": \"Services\",\r\n      \"sroItemSerialNo\": \"\"\r\n    }\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/di_data/v1/di/postinvoicedata_sb"
+			},
+			"response": []
+		},
+		{
+			"name": "Get HSCode",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/pdi/v1/itemdesccode"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Doc Types",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/pdi/v1/doctypecode"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Provinces",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/pdi/v1/provinces"
+			},
+			"response": []
+		},
+		{
+			"name": "Get SRO Item Code",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/pdi/v1/sroitemcode"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Trans type code",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/pdi/v1/transtypecode"
+			},
+			"response": []
+		},
+		{
+			"name": "Get UOM",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 2ebe4443-4c22-341f-8f4e-aa4002fcffcb",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "https://gw.fbr.gov.pk/pdi/v1/uom"
+			},
+			"response": []
+		}
+	]
+}

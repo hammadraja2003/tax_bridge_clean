@@ -1,0 +1,50 @@
+# Laravel & PHP
+/vendor
+/node_modules
+/storage/*.key
+/storage/pail
+/storage/logs
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/*.php
+ 
+# Public uploads (user-generated, DB dumps, postman collections)
+public/DB
+public/postman collections
+public/uploads
+ 
+# Build and compiled files
+/public/build
+/public/hot
+/public/storage
+ 
+# Environment & config
+.env
+.env.*
+!.env.example
+.phpactor.json
+.phpunit.result.cache
+/.phpunit.cache
+ 
+# IDE & Editor files
+/.idea
+/.vscode
+/.fleet
+/.nova
+/.zed
+ 
+# Vagrant / Homestead
+Homestead.json
+Homestead.yaml
+ 
+# NPM/Yarn
+npm-debug.log
+yarn-error.log
+ 
+# Composer
+auth.json
+ 
+# OS specific
+.DS_Store
+Thumbs.db

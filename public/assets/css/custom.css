@@ -1,0 +1,169 @@
+.required::after {
+    content: " *";
+    color: red;
+}
+.text-secureism {
+    color: #ba2331;
+}
+
+.activeTab {
+    background: #056464;
+}
+.app-logo {
+    /* background-color: #bc202e; */
+    background-color: #ffffff;
+}
+nav .app-logo .logo img {
+    width: 190px !important;
+}
+.dark-logo {
+    margin-bottom: 4px;
+    width: 185px;
+}
+table td {
+    white-space: nowrap;
+}
+@media (max-width: 767px) {
+    .logo {
+        display: none !important;
+    }
+}
+
+/* add by hammad */
+.card .card-header,
+.card .card-footer {
+    background-color: #d3d6e1;
+}
+.note-color {
+    color: #91910f;
+}
+.bank_detail div {
+    margin-bottom: 4px;
+}
+.bank_detail strong {
+    display: inline-block;
+    width: 140px;
+}
+.text-secureism {
+    color: #ba2331;
+}
+.w-190 {
+    width: 190px;
+}
+
+/* add by naseem */
+.bg-info {
+    background-color: rgb(234 244 255) !important;
+    border: solid 1px #3c91f3;
+}
+.bg-warning {
+    background-color: #fff1c7 !important;
+    color: #000000;
+    border: solid 1px #ffc107;
+}
+.app-wrapper .app-content {
+    padding-left: 17rem;
+    padding-right: 0rem;
+}
+footer .d-flex.flex-column {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 20px;
+}
+.extra-column {
+    display: none;
+}
+.details-row td {
+    background-color: #f9f9f9;
+    border-top: none;
+}
+.details-row .card.card-body {
+    background: #f3f3f3;
+}
+.leading-5 {
+    padding: 0px 15px;
+}
+.paginationtble-bottom nav {
+    all: revert;
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 10px;
+}
+.paginationtble-bottom .px-4 {
+    padding-right: 0.5rem !important;
+    padding-left: 0.5rem !important;
+    border-radius: 3px !important;
+}
+.btn-primary {
+    --bs-btn-bg: #056464 !important;
+    --bs-btn-border-color: #056464 !important;
+}
+
+.dark-sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: #111827;
+    transition: all 0.3s ease;
+    z-index: 1050;
+}
+
+@media (max-width: 992px) {
+    .dark-sidebar {
+        left: -260px;
+    }
+
+    .dark-sidebar.active {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1049;
+        display: none;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+}
+.app-wrapper .app-content {
+    padding-left: 15.5rem;
+    padding-right: 0rem;
+}
+/* td.actioncolumn button.btn.btn-xs.btn-outline-primary {
+    height: 25px !important;
+    padding: 0px !important;
+} 
+td.actioncolumn a.btn.btn-xs.btn-outline-info.show-invoice {
+    height: 25px !important;
+    padding: 0px !important;
+}
+td.actioncolumn button.btn.btn-xs.btn-outline-secondary.toggle-details {
+    height: 26px;
+    padding: 0px !important;
+}
+a.btn.btn-xs.btn-outline-warning {
+
+} */
+
+
+.d-flex.enab{
+    display: flex !important;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+}
+
+.card-body.d-flex.lokup  {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
