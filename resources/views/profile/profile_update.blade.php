@@ -85,7 +85,7 @@
             @php $user = Auth::user(); @endphp
 
             @if ($user->twofa_enabled)
-                <p class="text-success mb-2">Two-Factor Authentication is <strong>Enabled</strong></p>
+                <p class="text-success mb-0">Two-Factor Authentication is <strong>Enabled</strong></p>
                 <form method="POST" action="{{ route('2fa.disable') }}"
                     onsubmit="return confirm('Disable 2FA for your account?')">
                     @csrf

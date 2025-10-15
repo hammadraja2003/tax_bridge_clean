@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InvoiceController;
@@ -12,23 +13,27 @@ use App\Http\Controllers\FbrPostErrorController;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\FbrLookupController;
+use Illuminate\Support\Facades\Log;
+
 /*
 |--------------------------------------------------------------------------
 | Public Routes
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', function () {
     //  return phpinfo();
     return view('welcome');
 });
 
 // routes/web.php
-Route::get('/test-mail', function () {
-    \Illuminate\Support\Facades\Mail::raw('This is a test email from Laravel', function ($msg) {
-        $msg->to('hammadraja2003@gmail.com')->subject('Test Mail');
-    });
+Route::get('/logs', function () {
+    Log::channel('cloudwatch')->info('✅ CloudWatch info log test');
+    Log::channel('cloudwatch')->warning('⚠️ CloudWatch warning log test');
+    Log::channel('cloudwatch')->error('❌ CloudWatch error log test');
 
-    return 'Mail sent!';
+    Log::channel('single')->info('🧾 Local log test');
+    return '✅ Logs sent (check CloudWatch + storage/logs/laravel.log)';
 });
 
 
@@ -36,8 +41,7 @@ Route::middleware(['secret.key'])->group(function () {
     Route::get('/db/clone', [DatabaseController::class, 'showCloneForm'])->name('db.clone.form');
     Route::post('/db/clone', [DatabaseController::class, 'clone'])->name('db.clone');
 });
-// Route::view('/terms-and-conditions', 'legal.terms')->name('terms.conditions');
-Route::view('/privacy-policy', 'legal.privacy')->name('privacy.policy');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes
@@ -94,7 +98,7 @@ Route::middleware(['auth', 'verified', 'security.headers', 'set.tenant', 'busine
         return view('fbr');
     })->name('fbr.view');
     Route::post('/fbr/fetch', [FbrLookupController::class, 'fetch'])->name('fbr.fetch');
-    });
+});
 
 /*
 |--------------------------------------------------------------------------

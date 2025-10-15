@@ -25,12 +25,12 @@
                                     <thead>
                                         <tr>
                                             <th>Description</th>
-                                            <th>HS Code</th>
-                                            <th>Price</th>
-                                            <th>Tax Rate</th>
-                                            <th>UOM</th>
-                                            <th>Tempered</th>
-                                            <th>Actions</th>
+                                            <th class="w-50">HS Code</th>
+                                            <th class="w-50">Price</th>
+                                            <th class="w-90">Tax Rate</th>
+                                            <th class="w-50">UOM</th>
+                                            <th class="w-50">Tempered</th>
+                                            <th class="w-50">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody class="list" id="t-data">

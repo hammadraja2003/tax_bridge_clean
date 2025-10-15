@@ -5,8 +5,8 @@
         </span>
 
         <div class="small mt-1">
-            <a href="https://secureism.com/privacy-policy" target="_blank" class="text-decoration-none text-primary me-3">
-                Privacy Policy
+            <a href="https://secureism.com/privacy-policy" target="_blank" class="text-decoration-none text-primary me-3">Privacy Policy</a> | <a href="#" target="_blank" class="text-decoration-none text-primary me-3 ms-3">
+                Terms and Conditions
             </a>
         </div>
     </div>

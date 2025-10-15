@@ -75,14 +75,14 @@
                                 <table id="projectTableT" class="table table-sm table-striped table-bordered text-nowrap">
                                     <thead>
                                         <tr class="app-sort">
-                                            <th>Invoice Date</th>
-                                            <th>Invoice #</th>
-                                            <th>Posted to FBR</th>
+                                            <th class="w-50">Invoice Date</th>
+                                            <th class="w-50">Invoice #</th>
+                                            <th class="w-50">Posted to FBR</th>
                                             <th>Buyer</th>
-                                            <th>FBR Invoice #</th>
-                                            <th>Invoice Status</th>
-                                            <th>Excl. Tax</th>
-                                            <th>Incl. Tax</th>
+                                            <th class="w-50">FBR Invoice #</th>
+                                            <th class="w-50">Invoice Status</th>
+                                            <th class="w-50">Excl. Tax</th>
+                                            <th class="w-50">Incl. Tax</th>
                                             <th class="extra-column">Type</th>
                                             <th class="extra-column">FBR Env</th>
                                             <th class="extra-column">Seller</th>
@@ -129,7 +129,8 @@
                                                 <td class="email extra-column">{{ $inv->seller->bus_name ?? '-' }}</td>
 
                                                 <td class="extra-column">{{ number_format($inv->totalSalesTax, 2) }}</td>
-                                                <td class="extra-column">{{ number_format($inv->totalfurtherTax, 2) }}</td>
+                                                <td class="extra-column">{{ number_format($inv->totalfurtherTax, 2) }}
+                                                </td>
                                                 <td class="extra-column">{{ number_format($inv->totalextraTax, 2) }}</td>
                                                 <td class="extra-column">
                                                     @if ($inv->tampered)
@@ -143,7 +144,8 @@
                                                 <td class="actioncolumn">
                                                     <button type="button"
                                                         class="btn btn-xs btn-outline-secondary toggle-details"
-                                                        data-bs-toggle="tooltip" title="Show Details">+</button>
+                                                        data-bs-toggle="tooltip" title="Show Details"><i
+                                                            class="fa fa-angle-right"></i></button>
 
 
                                                     <button type="button" class="btn btn-xs btn-outline-primary"
@@ -192,61 +194,60 @@
                                 <div class="modal fade" id="itemsModal{{ $invoice->invoice_id }}" tabindex="-1"
                                     aria-labelledby="itemsModalLabel{{ $invoice->invoice_id }}" aria-hidden="true">
                                     <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Invoice Item Details</h5>
-                                                <button type="button" class="btn-close"
-                                                    data-bs-dismiss="modal"></button>
+                                        <div class="modal-content shadow-sm border-0 rounded-4">
+                                            <div class="modal-header bg-theme-one  py-3">
+                                                <h5 class="modal-title d-flex align-items-center gap-2 "
+                                                    id="itemsModalLabel{{ $invoice->invoice_id }}">
+                                                    <i class="bi bi-receipt-cutoff"></i> Invoice Item Details
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body">
+                                            <div class="modal-body px-4 py-3">
                                                 @if ($invoice->details->count())
                                                     <div class="table-responsive">
-                                                        <table class="table table-hover align-middle">
-                                                            <thead class="table-light">
-                                                                <tr class="text-uppercase small text-muted">
+                                                        <table
+                                                            class="table table-striped table-hover align-middle text-nowrap">
+                                                            <thead class="table-dark">
+                                                                <tr class="text-uppercase small ">
                                                                     <th>Description</th>
-                                                                    <th>Qty</th>
-                                                                    <th>Price</th>
-                                                                    <th>Tax</th>
-                                                                    <th>Total (Inc)</th>
-                                                                    <th>Total (Exc)</th>
-                                                                    <th>Sales Tax</th>
-                                                                    <th>Extra</th>
-                                                                    <th>Further</th>
-                                                                    <th>Fed</th>
-                                                                    <th>SRO #</th>
-                                                                    <th>Serial #</th>
+                                                                    <th class="text-center">Qty</th>
+                                                                    <th class="text-end">Price</th>
+                                                                    <th class="text-end">Tax (%)</th>
+                                                                    <th class="text-end">Total (Inc)</th>
+                                                                    <th class="text-end">Total (Exc)</th>
+                                                                    <th class="text-end">Sales Tax</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 @foreach ($invoice->details as $item)
                                                                     <tr>
-                                                                        <td class="fw-medium">
-                                                                            {{ $item->item->item_description ?? 'N/A' }}
+                                                                        <td>
+                                                                            <strong>{{ $item->item->item_description ?? 'N/A' }}</strong>
                                                                         </td>
-                                                                        <td>{{ $item->quantity }}</td>
-                                                                        <td>{{ number_format($item->item->item_price, 2) }}
+                                                                        <td class="text-center fw-semibold">
+                                                                            {{ $item->quantity }}</td>
+                                                                        <td class="text-end">
+                                                                            {{ number_format($item->item->item_price ?? 0, 0) }}
                                                                         </td>
-                                                                        <td>{{ number_format($item->item->item_tax_rate, 2) }}
+                                                                        <td class="text-end">
+                                                                            {{ number_format($item->item->item_tax_rate ?? 0, 0) }}%
                                                                         </td>
-                                                                        <td class="text-success">
-                                                                            {{ number_format($item->total_value, 2) }}</td>
-                                                                        <td>{{ number_format($item->value_excl_tax, 2) }}
+                                                                        <td class="text-end text-success fw-semibold">
+                                                                            {{ number_format($item->total_value, 0) }}</td>
+                                                                        <td class="text-end">
+                                                                            {{ number_format($item->value_excl_tax, 0) }}
                                                                         </td>
-                                                                        <td>{{ number_format($item->sales_tax_withheld, 2) }}
+                                                                        <td class="text-end">
+                                                                            {{ number_format($item->sales_tax_applicable, 0) }}
                                                                         </td>
-                                                                        <td>{{ number_format($item->extra_tax, 2) }}</td>
-                                                                        <td>{{ number_format($item->further_tax, 2) }}</td>
-                                                                        <td>{{ number_format($item->fed_payable, 2) }}</td>
-                                                                        <td>{{ $item->sro_schedule_no }}</td>
-                                                                        <td>{{ $item->sro_item_serial_no }}</td>
                                                                     </tr>
                                                                 @endforeach
                                                             </tbody>
                                                         </table>
                                                     </div>
                                                 @else
-                                                    <p class="text-muted">No items found for this invoice.</p>
+                                                    <p class="text-muted fst-italic">No items found for this invoice.</p>
                                                 @endif
                                             </div>
                                         </div>
@@ -339,33 +340,38 @@
             }
         });
     </script>
-
     <script nonce="{{ $nonce ?? '' }}">
         $(document).ready(function() {
             $('#projectTableT').on('click', '.toggle-details', function() {
                 var btn = $(this);
                 var tr = btn.closest('tr');
+                var icon = btn.find('i');
+
                 if (tr.next().hasClass('details-row')) {
                     tr.next().remove();
-                    btn.text('+');
+                    icon.removeClass('fa-angle-down').addClass('fa-angle-right');
                     return;
                 }
+
                 $('.details-row').remove();
-                $('.toggle-details').text('+');
-                btn.text('-');
+                $('.toggle-details i').removeClass('fa-angle-down').addClass('fa-angle-right');
+                icon.removeClass('fa-angle-right').addClass('fa-angle-down');
+
                 var hiddenCells = tr.children('td.extra-column');
                 var labels = ["Type", "FBR Env", "Seller", "Total Sales Tax", "Total Further Tax",
                     "Total Extra Tax", "Tempered"
                 ];
+
                 var detailsHtml = '<div class="card card-body m-0 px-3 py-2"><div class="row">';
                 hiddenCells.each((i, cell) => {
                     detailsHtml +=
                         `<div class="col-sm-12 col-md-3"><strong>${labels[i]}:</strong> ${$(cell).html()}</div>`;
                 });
                 detailsHtml += '</div></div>';
+
                 tr.after(
                     `<tr class="details-row"><td colspan="${tr.children('td').length}" class="p-0">${detailsHtml}</td></tr>`
-                );
+                    );
             });
         });
     </script>

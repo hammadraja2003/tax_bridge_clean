@@ -12,7 +12,7 @@ class TenantManager
         if ($business) {
             Config::set("database.connections.tenant", [
                 'driver'   => 'mysql',
-                'host'     => $business->db_host ?: '127.0.0.1',
+                'host'     => $business->db_host ?: 'dev.fbr-di-mysql',
                 'database' => $business->db_name,
                 'username' => $business->db_username,
                 'password' => $business->db_password,

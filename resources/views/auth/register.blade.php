@@ -1,4 +1,6 @@
 @extends('layouts.login')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendor/tabler-icons/tabler-icons.css') }}">
 @section('content')
     <style>
         .required::after {
@@ -70,7 +72,7 @@
     <div class="col-12 py-5 bg-white">
         <div class="mb-5 text-center text-lg-start">
             <div class="d-flex justify-content-center align-items-center my-2">
-                     <img src="{{ asset('assets/images/logo/' . config('app.logo')) }}" alt="Logo" class="dark-logo">
+                <img src="{{ asset('assets/images/logo/' . config('app.logo')) }}" alt="Logo" class="dark-logo">
             </div>
         </div>
     </div>
@@ -199,10 +201,10 @@
 
                                                 <!-- Registration -->
                                                 <div class="col-md-4">
-                                                    <label class="form-label required">Registration #</label>
+                                                    <label class="form-label">Registration #</label>
                                                     <input type="text" name="bus_reg_num"
                                                         class="form-control @error('bus_reg_num') is-invalid @enderror"
-                                                        value="{{ old('bus_reg_num') }}" required
+                                                        value="{{ old('bus_reg_num') }}"
                                                         placeholder="Enter your Registration Number">
                                                     <div class="invalid-feedback">
                                                         @error('bus_reg_num')
@@ -298,11 +300,11 @@
                                         <div class="tab-pane fade" id="v-history-tab-pane" role="tabpanel">
                                             <div class="row g-3">
                                                 <div class="col-md-4">
-                                                    <label class="form-label required">Branch Name</label>
+                                                    <label class="form-label">Branch Name</label>
                                                     <input type="text" name="bus_acc_branch_name"
                                                         class="form-control @error('bus_acc_branch_name') is-invalid @enderror"
                                                         value="{{ old('bus_acc_branch_name') }}"
-                                                        placeholder="Enter your Branch Name" required>
+                                                        placeholder="Enter your Branch Name">
                                                     <div class="invalid-feedback">
                                                         @error('bus_acc_branch_name')
                                                             {{ $message }}
@@ -313,11 +315,11 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    <label class="form-label required">Branch Code</label>
+                                                    <label class="form-label">Branch Code</label>
                                                     <input type="text" name="bus_acc_branch_code"
                                                         class="form-control @error('bus_acc_branch_code') is-invalid @enderror"
                                                         value="{{ old('bus_acc_branch_code') }}"
-                                                        placeholder="Enter your Branch Code" required>
+                                                        placeholder="Enter your Branch Code">
                                                     <div class="invalid-feedback">
                                                         @error('bus_acc_branch_code')
                                                             {{ $message }}
@@ -328,11 +330,11 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    <label class="form-label required">Account Title</label>
+                                                    <label class="form-label">Account Title</label>
                                                     <input type="text" name="bus_account_title"
                                                         class="form-control @error('bus_account_title') is-invalid @enderror"
                                                         value="{{ old('bus_account_title') }}"
-                                                        placeholder="Enter your Account Title" required>
+                                                        placeholder="Enter your Account Title">
                                                     <div class="invalid-feedback">
                                                         @error('bus_account_title')
                                                             {{ $message }}
@@ -343,11 +345,11 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    <label class="form-label required">Account Number</label>
+                                                    <label class="form-label">Account Number</label>
                                                     <input type="text" name="bus_account_number"
                                                         class="form-control @error('bus_account_number') is-invalid @enderror"
                                                         value="{{ old('bus_account_number') }}"
-                                                        placeholder="Enter your Account Number" required>
+                                                        placeholder="Enter your Account Number">
 
                                                     <div class="invalid-feedback">
                                                         @error('bus_account_number')
@@ -359,11 +361,10 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    <label class="form-label required">IBAN</label>
+                                                    <label class="form-label">IBAN</label>
                                                     <input type="text" name="bus_IBAN"
                                                         class="form-control @error('bus_IBAN') is-invalid @enderror"
-                                                        value="{{ old('bus_IBAN') }}" placeholder="Enter your IBAN"
-                                                        required>
+                                                        value="{{ old('bus_IBAN') }}" placeholder="Enter your IBAN">
                                                     <div class="invalid-feedback">
                                                         @error('bus_IBAN')
                                                             {{ $message }}
@@ -623,14 +624,36 @@
             applyValidation();
         });
     </script>
-    <script>
+
+    <link href="{{ asset('assets/css/select2.min.css') }}" rel="stylesheet" />
+    <script src="{{ asset('assets/js/select2.min.js') }}"></script>
+
+    <script nonce="{{ $nonce ?? '' }}">
         $(document).ready(function() {
-            $('#scenario_ids').select2({
-                placeholder: "Select Scenarios",
-                allowClear: true
+            function initSelect2() {
+                $('#scenario_ids').select2({
+                    placeholder: "Select Scenarios",
+                    allowClear: true,
+                    width: '100%' // ✅ ensures proper sizing inside tab
+                });
+            }
+
+            // Initialize once
+            initSelect2();
+
+            // ✅ Re-initialize when tab becomes visible (Bootstrap tab event)
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+                if ($(e.target).attr('href') === '#v-reviews-tab-pane') {
+                    $('#scenario_ids').select2({
+                        placeholder: "Select Scenarios",
+                        allowClear: true,
+                        width: '100%'
+                    });
+                }
             });
         });
     </script>
+
 
     <script nonce="{{ $nonce ?? '' }}">
         document.addEventListener('DOMContentLoaded', function() {

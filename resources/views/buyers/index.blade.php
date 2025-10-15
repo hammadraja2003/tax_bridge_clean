@@ -53,20 +53,19 @@
                                 </form>
                             </div>
                             <div class="app-scroll overflow-auto">
-                                <table id="projectTableT" class="table table-striped table-bordered m-0">
+                                <table id="buyersTable" class="table table-striped table-bordered m-0 align-middle">
                                     <thead>
                                         <tr class="app-sort">
-                                            <th>Logo</th>
+                                            <th class="w-50">Logo</th>
                                             <th>Name</th>
-                                            <th>Type</th>
-                                            <th>Client Details</th>
-                                            <th>Bank Details</th>
-                                            <th>Address</th>
-                                            <th>Tempered</th>
-                                            <th>Actions</th>
+                                            <th class="w-50">Type</th>
+                                            <th class="extra-column">Client Details</th>
+                                            <th class="extra-column">Bank Details</th>
+                                            <th class="extra-column">Tempered</th>
+                                            <th class="w-50">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="list" id="t-data">
+                                    <tbody id="buyersData">
                                         @forelse($buyers as $buyer)
                                             <tr @if ($buyer->tampered) class="table-warning" @endif>
                                                 <td>
@@ -77,55 +76,67 @@
                                                                 $buyer->byr_logo,
                                                             );
                                                         @endphp
-                                                        <img src="{{ $url }}" alt="Logo" width="50">
-                                                        {{-- <img src="{{ Storage::disk(env('FILESYSTEM_DISK'))->temporaryUrl($buyer->byr_logo, now()->addMinutes(5)) }}"
-                                                            alt="Logo" width="50"> --}}
+                                                        <img src="{{ $url }}" alt="Logo" width="50"
+                                                            class="rounded">
                                                     @else
                                                         N/A
                                                     @endif
                                                 </td>
-                                                <td class="employee">{{ $buyer->byr_name }}</td>
-                                                <td class="email">
+
+                                                <td>{{ $buyer->byr_name }}</td>
+
+                                                <td>
                                                     @if ($buyer->byr_type == 1)
                                                         <span class="badge bg-success">Registered</span>
                                                     @else
                                                         <span class="badge bg-secondary">Unregistered</span>
                                                     @endif
                                                 </td>
-                                               <td class="contact">
-                                                    <div class="bank_detail">
-                                                        <div><strong>NTN/CNIC:</strong> {{ $buyer->byr_ntn_cnic ?? '-' }}</div>
-                                                        <div><strong>Contact Person:</strong> {{ $buyer->byr_contact_person ?? '-' }}</div>
-                                                        <div><strong>Contact #:</strong> {{ $buyer->byr_contact_num ?? '-' }}</div>
+
+                                                <td class="extra-column">
+                                                    <div><strong>NTN/CNIC:</strong> {{ $buyer->byr_ntn_cnic ?? '-' }}</div>
+                                                    <div><strong>Contact Person:</strong>
+                                                        {{ $buyer->byr_contact_person ?? '-' }}</div>
+                                                    <div><strong>Contact #:</strong> {{ $buyer->byr_contact_num ?? '-' }}
                                                     </div>
-                                                </td>
-                                               <td class="contact">
-                                                    <div class="bank_detail">
-                                                        <div><strong>IBAN:</strong> {{ $buyer->byr_IBAN ?? '-' }}</div>
-                                                        <div><strong>Account Title:</strong> {{ $buyer->byr_account_title ?? '-' }}</div>
-                                                        <div><strong>Account Number:</strong> {{ $buyer->byr_account_number ?? '-' }}</div>
-                                                    </div>
+                                                    <div><strong>Address:</strong> {{ $buyer->byr_address ?? '-' }}</div>
                                                 </td>
 
-                                                <td class="employee">{{ $buyer->byr_address }}</td>
-                                                <td class="status">
+                                                <td class="extra-column">
+                                                    <div><strong>IBAN:</strong> {{ $buyer->byr_IBAN ?? '-' }}</div>
+                                                    <div><strong>Account Title:</strong>
+                                                        {{ $buyer->byr_account_title ?? '-' }}</div>
+                                                    <div><strong>Account Number:</strong>
+                                                        {{ $buyer->byr_account_number ?? '-' }}</div>
+                                                </td>
+
+                                                <td class="extra-column">
                                                     @if ($buyer->tampered)
                                                         <span class="text-danger fw-bold">⚠ Data tampered!</span>
                                                     @else
                                                         <span class="text-success">OK</span>
                                                     @endif
                                                 </td>
+
                                                 <td>
+                                                    <button type="button"
+                                                        class="btn btn-xs btn-outline-secondary toggle-details"
+                                                        data-bs-toggle="tooltip" title="Show Details">
+                                                        <i class="fa fa-angle-right"></i>
+                                                    </button>
+
                                                     <a href="{{ route('buyers.edit', Crypt::encryptString($buyer->byr_id)) }}"
-                                                        class="btn btn-xs btn-outline-warning">
+                                                        class="btn btn-xs btn-outline-warning" data-bs-toggle="tooltip"
+                                                        title="Edit">
                                                         <i class="ti ti-edit"></i>
                                                     </a>
+
                                                     <form action="{{ route('buyers.delete', $buyer->byr_id) }}"
                                                         method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="button"
-                                                            class="btn btn-xs btn-outline-danger">
+                                                        <button type="button" class="btn btn-xs btn-outline-danger"
+                                                            title="Delete">
                                                             <i class="ti ti-trash f-s-20"></i>
                                                         </button>
                                                     </form>
@@ -133,15 +144,17 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="12" class="text-center">No buyers found.</td>
+                                                <td colspan="7" class="text-center">No buyers found.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
+
                                 <div class="paginationtble-bottom">
                                     {{ $buyers->links() }}
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -149,4 +162,38 @@
         </div>
     </div>
     </div>
+    <script nonce="{{ $nonce ?? '' }}">
+        $(document).ready(function() {
+            $('#buyersTable').on('click', '.toggle-details', function() {
+                const btn = $(this);
+                const tr = btn.closest('tr');
+                const icon = btn.find('i');
+
+                if (tr.next().hasClass('details-row')) {
+                    tr.next().remove();
+                    icon.removeClass('fa-angle-down').addClass('fa-angle-right');
+                    return;
+                }
+
+                $('.details-row').remove();
+                $('.toggle-details i').removeClass('fa-angle-down').addClass('fa-angle-right');
+                icon.removeClass('fa-angle-right').addClass('fa-angle-down');
+
+                const extraCols = tr.find('td.extra-column');
+                const labels = ['Client Details', 'Bank Details', 'Tempered'];
+                let detailsHtml = '<div class="card card-body m-0 px-3 py-2"><div class="row g-3">';
+
+                extraCols.each((i, col) => {
+                    detailsHtml +=
+                        `<div class="col-sm-12 col-md-4"><strong>${labels[i]}:</strong><br>${$(col).html()}</div>`;
+                });
+
+                detailsHtml += '</div></div>';
+
+                tr.after(
+                    `<tr class="details-row"><td colspan="${tr.children('td').length}" class="p-0">${detailsHtml}</td></tr>`
+                    );
+            });
+        });
+    </script>
 @endsection

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{ config('app.name', 'Secureism | Invoicing Management System') }}</title>
+    <title>{{ config('app.name', 'TaxBridge | Invoicing Management System') }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;

@@ -18,12 +18,18 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 Route::middleware('guest')->group(function () {
     Route::get('configuration', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('configuration', [RegisteredUserController::class, 'store'])->middleware('throttle:5,1');
+    
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:5,1');
-    // Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    // Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email')->middleware('throttle:3,1');
-    // Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-    // Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+
+
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
+        ->name('password.reset');
+    Route::put('/reset-password', [ResetPasswordController::class, 'reset'])
+        ->name('password.update');
+
     Route::get('2fa', [TwoFactorController::class, 'showVerifyForm'])->name('2fa.verify');
     Route::post('2fa', [TwoFactorController::class, 'verifyCode'])
         ->name('2fa.check')
@@ -48,13 +54,3 @@ Route::middleware('auth')->group(function () {
     Route::post('2fa/enable', [TwoFactorSetupController::class, 'enable'])->name('2fa.enable');
     Route::post('2fa/disable', [TwoFactorSetupController::class, 'disable'])->name('2fa.disable');
 });
-// Show forgot password form
-Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-// Send reset email
-Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-// 1. Show reset form (GET)
-Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
-    ->name('password.reset');
-// 2. Handle reset password (POST or PUT)
-Route::put('/reset-password', [ResetPasswordController::class, 'reset'])
-    ->name('password.update');

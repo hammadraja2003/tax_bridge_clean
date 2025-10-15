@@ -10,7 +10,7 @@ return [
     | other UI elements where an application name needs to be displayed.
     |
     */
-    'name' => env('APP_NAME', 'Secureism | Invoicing Management System'),
+    'name' => env('APP_NAME', 'TaxBridge | Invoicing Management System'),
     /*
     |--------------------------------------------------------------------------
     | Application Environment
