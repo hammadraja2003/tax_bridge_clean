@@ -1,5 +1,4 @@
 @extends('layouts.admin')
-
 @section('content')
     <div class="container">
         <h2 class="mb-4 text-center">Profile Update</h2>
@@ -10,7 +9,6 @@
         <form class="app-form needs-validation" id="updateProfileForm" novalidate method="POST"
             action="{{ route('update-profile', $encryptedId) }}" enctype="multipart/form-data">
             @csrf
-
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="row mb-3">
@@ -26,7 +24,6 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
                         <!-- Email -->
                         <div class="col-md-6">
                             <label class="form-label required">Email</label>
@@ -41,7 +38,6 @@
                             @enderror
                         </div>
                     </div>
-
                     <div class="row mb-3">
                         <!-- Password -->
                         <div class="col-md-6">
@@ -59,7 +55,6 @@
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
-
                         <!-- Confirm Password -->
                         <div class="col-md-6">
                             <label class="form-label required">Confirm Password</label>
@@ -72,7 +67,6 @@
                             <div id="passwordMatchError" class="text-danger"></div>
                         </div>
                     </div>
-
                     <div class="text-end">
                         <button type="submit" class="btn btn-primary">Update Profile</button>
                     </div>
@@ -83,33 +77,30 @@
         <!-- 2FA Controls -->
         <div class="mt-4 text-center">
             @php $user = Auth::user(); @endphp
-
             @if ($user->twofa_enabled)
                 <p class="text-success mb-0">Two-Factor Authentication is <strong>Enabled</strong></p>
                 <form method="POST" action="{{ route('2fa.disable') }}"
                     onsubmit="return confirm('Disable 2FA for your account?')">
                     @csrf
-                    <button type="submit" class="btn btn-outline-danger w-100">
+                    <button type="submit" class="btn btn-outline-primary">
                         Disable Two-Factor Authentication
                     </button>
                 </form>
             @elseif($user->twofa_secret)
-            <div class=" d-flex enab"> 
-                <p class="text-warning mb-0">Two-Factor Authentication is <strong>Disabled</strong></p>
-                <a href="{{ route('2fa.setup') }}" class="btn btn-outline-primary">
-                    Enable Two-Factor Authentication
-                </a>
-            </div>
+                <div class=" d-flex enab">
+                    <p class="text-warning mb-0">Two-Factor Authentication is <strong>Disabled</strong></p>
+                    <a href="{{ route('2fa.setup') }}" class="btn btn-outline-primary">
+                        Enable Two-Factor Authentication
+                    </a>
+                </div>
             @else
                 <p class="text-danger mb-2">You have not set up Two-Factor Authentication yet.</p>
-                <a href="{{ route('edit-profile', Crypt::encrypt($user->id)) }}" class="btn btn-outline-primary">
+                <a href="{{ route('2fa.setup') }}" class="btn btn-outline-primary">
                     Set up 2FA
                 </a>
             @endif
         </div>
-
     </div> <!-- end container -->
-
     <script nonce="{{ $nonce }}">
         // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
@@ -123,7 +114,6 @@
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         });
-
         // Toggle confirm password visibility
         document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
             const confirmInput = document.getElementById('confirmed_password');
@@ -136,13 +126,11 @@
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         });
-
         // Check password match on form submit
         document.getElementById('updateProfileForm').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirm = document.getElementById('confirmed_password').value;
             const error = document.getElementById('passwordMatchError');
-
             if (password !== confirm) {
                 e.preventDefault();
                 error.textContent = 'Passwords do not match.';

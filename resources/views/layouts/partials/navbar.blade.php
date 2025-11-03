@@ -2,7 +2,7 @@
     <div class="app-logo">
         <a class="logo d-none d-sm-inline-block" href="#">
             <img src="{{ businessLogo() }}" alt="Company Logo" class="dark-logo">
-            <img src="{{ asset('assets/images/logo/1.png') }}" alt="#" class="light-logo">
+            <img src="{{ asset('assets/images/logo/favicon.ico.png') }}" alt="#" class="light-logo">
         </a>
         <span class="bg-light-light toggle-semi-nav">
             <i class="ti ti-chevrons-right f-s-20"></i>
@@ -24,7 +24,9 @@
                     $isItemsRoute = request()->routeIs('items.*');
                     $isActivityRoute = request()->routeIs('activity.*');
                     $isAuditRoute = request()->routeIs('audit_logs.*');
-                    $isFbrErrorRoute = request()->routeIs('fbr_errors.*');
+                    $isFbrErrorRoute = request()->routeIs('fbr.errors');
+                    $isFbrViewRoute = request()->routeIs('fbr.view');
+                    $isImportRoute = request()->routeIs('invoices.import.*');
                 @endphp
                 <a class="{{ $isInvoiceRoute ? 'activeTab' : '' }}" href="{{ route('invoices.index') }}">
                     <i class="ti ti-chart-treemap"></i>Invoices
@@ -62,19 +64,19 @@
                         </a>
                     </li>
                     <li>
-                        <a class="{{ $isFbrErrorRoute ? 'activeTab' : '' }}" href="{{ route('fbr.view') }}">
+                        <a class="{{ $isFbrViewRoute  ? 'activeTab' : '' }}" href="{{ route('fbr.view') }}">
                             Fbr Lookups
                         </a>
                     </li>
                     {{-- <li>
-                        <a href="{{ route('invoices.import.form') }}">
+                        <a class="{{ $isImportRoute  ? 'activeTab' : '' }}"  href="{{ route('invoices.import.form') }}">
                             Import Invoices
                         </a>
                     </li> --}}
                 </ul>
             </li>
             <li class="no-sub">
-                <form id="logout-form" action="{{ route('logout') }}" method="POST">
+                <form class="logout-form" action="{{ route('logout') }}" method="POST">
                     @csrf
                 </form>
                 <a href="#" id="logout-link">

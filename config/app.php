@@ -44,7 +44,7 @@ return [
     |
     */
     'url' => env('APP_URL', 'http://localhost'),
-    'logo' => env('APP_LOGO', 'secureism_logo.svg'),
+    'logo' => env('APP_LOGO', 'tax-bridge.svg'),
 
     /*
     |--------------------------------------------------------------------------
@@ -58,7 +58,7 @@ return [
     */
     // 'timezone' => 'UTC',
     'timezone' => env('APP_TIMEZONE', 'UTC'),
-    'db_secret' => env('APP_DB_SECRET', 'mySuperSecretKey123'),
+    'db_secret' => env('APP_DB_SECRET', ''),
 
 
 

@@ -1,0 +1,19 @@
+nav {
+    width: 17rem;
+    height: 100vh;
+    display: inline-block;
+    position: fixed;
+    background-color: #c5dfd3;
+    z-index: 1003;
+}
+header.header-main .card-body {
+    background: #97c5b0;
+}
+.simplebar-mask ul.main-nav a.activeTab {
+    background: #97c5b0;
+}
+.iconsidebaropn {
+    background: #7da090 !important;
+    color: #fff !important;
+    /* line-height: 17px; */
+}

@@ -12,17 +12,16 @@ use App\Models\BusinessConfiguration;
 use App\Models\Item;
 use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\HeadingRowImport;
 use Illuminate\Support\Facades\Validator;
 use App\Services\FbrInvoiceService;
 use Illuminate\Support\Facades\Log;
-// use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Str;
 use App\Models\FbrPostError;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
-
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -32,13 +31,10 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $fbrEnv = getFbrEnv();
-        // filter by FBR environment
         $query = Invoice::with(['buyer', 'seller', 'details.item'])->where('fbr_env', $fbrEnv);
-        // 🔎 Filter by invoice type
         if ($request->filled('invoice_type')) {
             $query->where('invoice_type', trim($request->invoice_type));
         }
-        // 📅 Filter by date range
         if ($request->filled('date_from') && $request->filled('date_to')) {
             $query->whereBetween('invoice_date', [
                 Carbon::parse($request->date_from)->toDateString(),
@@ -49,16 +45,12 @@ class InvoiceController extends Controller
         } elseif ($request->filled('date_to')) {
             $query->whereDate('invoice_date', '<=', Carbon::parse($request->date_to)->toDateString());
         }
-        // ✅ Filter by FBR posting status
         if ($request->has('is_posted_to_fbr') && $request->is_posted_to_fbr !== '' && $request->is_posted_to_fbr !== null) {
             $query->where('is_posted_to_fbr', $request->is_posted_to_fbr);
         }
-        // Fetch with latest invoice_date
         $invoices = $query->orderByDesc('invoice_id')->paginate(10);
         foreach ($invoices as $invoice) {
-            // Header tampering
             $invoice->tampered = $invoice->isTampered();
-            // Details tampering
             $tamperedLines = false;
             foreach ($invoice->details as $detail) {
                 if ($detail->isTampered()) {
@@ -75,14 +67,12 @@ class InvoiceController extends Controller
     {
         $tenantId = Auth::user()->tenant_id ?? session('tenant_id');
         $seller = BusinessConfiguration::where('bus_config_id', $tenantId)->first();
-
         if (! $seller) {
             return redirect()->route('company.configuration')
                 ->with('error', 'Please configure your business first before creating an invoice.');
         }
         $buyers = Buyer::all();
         $items = Item::all();
-
         return view('invoices.create', compact('seller', 'buyers', 'items'));
     }
     public function storeFbrError(string $type, array $response)
@@ -120,8 +110,6 @@ class InvoiceController extends Controller
     }
     public function storeOrUpdate(Request $request, $id = null)
     {
-
-        // Allow script to run up to 120 seconds
         set_time_limit(120);
         $data = $request->only([
             'invoiceType',
@@ -154,13 +142,11 @@ class InvoiceController extends Controller
             'items',
             'invoice_status'
         ]);
-        // Filter out invalid items
         $filteredItems = array_filter($data['items'] ?? [], function ($item) {
             return isset($item['item_id'], $item['quantity'], $item['totalValues']);
         });
         $data['items'] = array_values($filteredItems);
         $request->merge(['items' => $data['items']]);
-        // Validation
         $request->validate([
             'invoiceType' => 'required|string',
             'invoiceDate' => 'required|date',
@@ -170,12 +156,6 @@ class InvoiceController extends Controller
                 Rule::exists('business_configurations', 'bus_config_id')
                     ->where(fn($query) => $query->where('bus_config_id', session('tenant_id'))),
             ],
-            // 'byr_id' => [
-            //     'required',
-            //     'integer',
-            //     Rule::exists(session('tenant_db') . 'buyers', 'byr_id')
-            //         ->where(fn($query) => $query->where('tenant_id', session('tenant_id'))),
-            // ],
             'buyerRegistrationType' => 'required|string',
             'items.*.item_id' => 'required|integer',
             'items.*.quantity' => 'required|numeric|min:0.01',
@@ -188,7 +168,6 @@ class InvoiceController extends Controller
             'items.*.rate' => 'required|string',
             'items.*.uoM' => 'required|string',
         ]);
-
         DB::beginTransaction();
         try {
             $isDraft = $data['invoice_status'] == 1;
@@ -196,7 +175,6 @@ class InvoiceController extends Controller
             if ($id && $invoice->is_posted_to_fbr) {
                 return back()->with('error', 'You cannot update an invoice that is already posted to FBR.');
             }
-            // Save main invoice
             $invoice->fill([
                 'invoice_type' => $data['invoiceType'],
                 'invoice_date' => $data['invoiceDate'],
@@ -224,7 +202,6 @@ class InvoiceController extends Controller
                     'invoice_no' => 'INV-' . str_pad($invoice->invoice_id, 6, '0', STR_PAD_LEFT)
                 ]);
             }
-            // Save invoice items
             if ($id) {
                 InvoiceDetail::where('invoice_id', $invoice->invoice_id)->delete();
             }
@@ -247,15 +224,13 @@ class InvoiceController extends Controller
                     'sro_item_serial_no' => $item['sroItemSerialNo'] ?? '',
                 ]);
             }
-            // FBR posting if not draft
             if (!$isDraft) {
-
                 $fbrErrors   = [];
                 $userErrors  = [];
                 $fbrPayload = [
                     'invoiceType' => $data['invoiceType'] === 'Sales Invoice' ? 'Sale Invoice' : $data['invoiceType'],
                     'invoiceDate' => $data['invoiceDate'],
-                    'sellerNTNCNIC' => preg_replace('/\D/', '', $data['sellerNTNCNIC']), // remove non-digits
+                    'sellerNTNCNIC' => preg_replace('/\D/', '', $data['sellerNTNCNIC']),
                     'sellerBusinessName' => $data['sellerBusinessName'],
                     'sellerProvince' => $data['sellerProvince'],
                     'sellerAddress' => $data['sellerAddress'],
@@ -288,13 +263,10 @@ class InvoiceController extends Controller
                         ];
                     }, $data['items']),
                 ];
-
                 $fbrService = new FbrInvoiceService();
-                // Step 1: Validate
                 $validation = $fbrService->validateInvoice($fbrPayload);
                 $validationPassed = false;
                 if (!$validation['success']) {
-                    //push this data into global array for 
                     $fbrErrors[] = [
                         'type'             => 'validation',
                         'status_code'      => $validation['statusCode'] ?? null,
@@ -308,13 +280,14 @@ class InvoiceController extends Controller
                     $userErrors[] = 'FBR Validation Failed: ' . (
                         $validation['error']
                         ?? ($validation['invoiceStatuses'][0]['error'] ?? 'Unknown validation error'));
+                    Log::info('FBR Payload during Validation', [
+                        'fbrPayload'   => $fbrPayload
+                    ]);
                     DB::rollBack();
                 } else {
                     $validationPassed = true;
                 }
-
                 if ($validationPassed) {
-                    // Step 2: Post
                     $posting = $fbrService->postInvoice($fbrPayload);
                     if (!$posting['success']) {
                         $fbrErrors[] = [
@@ -330,17 +303,18 @@ class InvoiceController extends Controller
                         $userErrors[] = 'FBR Posting Failed: ' . (
                             $posting['error']
                             ?? ($posting['invoiceStatuses'][0]['error'] ?? 'Unknown posting error'));
+                        Log::info('FBR Payload during Posting', [
+                            'fbrPayload'   => $fbrPayload
+                        ]);
                         DB::rollBack();
                     }
                     if ($posting['success']) {
-                        // ✅ Update invoice
                         $invoice->update([
                             'fbr_invoice_number' => $posting['data']['invoiceNumber'] ?? null,
                             'is_posted_to_fbr'   => 1,
                             'response_status'    => 'Success',
                             'response_message'   => 'Posted successfully to FBR ' . strtoupper(getFbrEnv()),
                         ]);
-                        // ✅ Log activity
                         logActivity(
                             'update',
                             'Posted invoice to FBR: ' . $invoice->invoice_no,
@@ -348,62 +322,27 @@ class InvoiceController extends Controller
                             $invoice->invoice_no,
                             'invoices'
                         );
-
-                        // $qrData = $posting['data']['invoiceNumber'];
-                        // $qrFileName = 'qr_' . $invoice->invoice_no . '_' . time() . '.png';
-                        // $folder = 'qr_codes';
-
-                        // // Which disk to use (uploads, public, s3, etc.)
-                        // $disk = env('FILESYSTEM_DISK', config('filesystems.default', 'uploads'));
-
-                        // // Generate QR
-                        // $result = Builder::create()
-                        //     ->writer(new PngWriter())
-                        //     ->data($qrData)
-                        //     ->size(200)
-                        //     ->build();
-
-                        // // Save file using Storage (works for local or S3)
-                        // $path = $folder . '/' . $qrFileName;
-                        // Storage::disk($disk)->put($path, $result->getString(), ($disk === 's3') ? ['visibility' => 'public'] : []);
-
-                        // $invoice->update([
-                        //     'qr_code' => $path,
-                        //     'invoice_status' => 2,
-                        // ]);
-
                         $qrData     = $posting['data']['invoiceNumber'];
                         $qrFileName = 'qr_' . $invoice->invoice_no . '_' . time() . '.png';
                         $folder     = 'qr_codes';
-
-                        // Pick disk from .env (default = uploads)
                         $disk = env('FILESYSTEM_DISK', config('filesystems.default', 'uploads'));
-
-                        // Generate QR code
                         $result = Builder::create()
                             ->writer(new PngWriter())
                             ->data($qrData)
                             ->size(200)
                             ->build();
-
-                        // Build storage path
                         $path = $folder . '/' . $qrFileName;
-
                         try {
-                            // Upload QR to chosen disk
                             $uploaded = Storage::disk($disk)->put(
                                 $path,
                                 $result->getString(),
-                                $disk === 's3' ? [] : null // no need for visibility override
+                                $disk === 's3' ? [] : null
                             );
-
                             if ($uploaded) {
                                 Log::info('✅ QR code uploaded successfully', [
                                     'disk' => $disk,
                                     'path' => $path,
                                 ]);
-
-                                // Save path in DB
                                 $invoice->update([
                                     'qr_code'        => $path,
                                     'invoice_status' => 2,
@@ -424,15 +363,12 @@ class InvoiceController extends Controller
                         }
                     }
                 }
-
                 if (!empty($fbrErrors)) {
-                    // Insert errors in a separate transaction
                     DB::transaction(function () use ($fbrErrors) {
                         foreach ($fbrErrors as $err) {
                             FbrPostError::logError($err);
                         }
                     });
-
                     session()->flash('fbrErrors', $fbrErrors);
                     return back()
                         ->withInput()
@@ -443,7 +379,6 @@ class InvoiceController extends Controller
             return redirect()->route('invoices.index')->with('message', $id ? 'Invoice updated successfully.' : 'Invoice created successfully');
         } catch (\Throwable $e) {
             DB::rollBack();
-
             return redirect()
                 ->back()
                 ->withInput()
@@ -456,10 +391,38 @@ class InvoiceController extends Controller
         $invoice = Invoice::with(['items', 'buyer', 'seller'])->findOrFail($invoiceId);
         $buyers = Buyer::all();
         $items = Item::all();
-        // $seller = BusinessConfiguration::first();
         $tenantId = Auth::user()->tenant_id ?? session('tenant_id');
         $seller = BusinessConfiguration::where('bus_config_id', $tenantId)->first();
         return view('invoices.create', compact('invoice', 'buyers', 'items', 'seller'));
+    }
+    public function delete($id)
+    {
+        $invoice = Invoice::with('details')->findOrFail($id);
+        // Only allow delete if invoice is in draft status
+        if ($invoice->invoice_status != Invoice::STATUS_DRAFT) {
+            $validator = \Validator::make([], []);
+            $validator->errors()->add(
+                'toast_error',
+                'Only draft invoices can be deleted. This invoice has already been posted.'
+            );
+
+            return redirect()
+                ->route('invoices.index')
+                ->withErrors($validator);
+        }
+        $oldData = $invoice->toArray();
+        $invoice->details()->delete();
+        $invoice->delete();
+        logActivity(
+            'delete',
+            'Deleted draft invoice: ' . ($oldData['invoice_no'] ?? 'N/A'),
+            $oldData,
+            $id,
+            'invoices'
+        );
+        return redirect()
+            ->route('invoices.index')
+            ->with('message', 'Draft invoice and its details deleted successfully.');
     }
     public function modalPreview($id)
     {
@@ -470,15 +433,11 @@ class InvoiceController extends Controller
                 'seller',
                 'details.item'
             ])->findOrFail($invoiceId);
-
-            // Return the view content for AJAX requests
             if (request()->ajax()) {
                 return view('invoices.modal_preview', [
                     'invoice' => $invoice,
                 ])->render();
             }
-
-            // For direct access, return the full view
             return view('invoices.modal_preview', [
                 'invoice' => $invoice,
             ]);
@@ -503,10 +462,132 @@ class InvoiceController extends Controller
             'nonce'   => $nonce,
         ]);
     }
-    // public function showForm()
-    // {
-    //     return view('invoices.import');
-    // }
+    public function download($id)
+    {
+        try {
+            $invoiceId = Crypt::decryptString($id);
+            $invoice = Invoice::with([
+                'buyer',
+                'seller',
+                'details.item'
+            ])->findOrFail($invoiceId);
+            $pdf = Pdf::loadView('invoices.download_invoice', ['invoice' => $invoice]);
+            return response($pdf->output(), 200)
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'inline; filename="invoice.pdf"');
+        } catch (\Exception $e) {
+            if (request()->ajax()) {
+                return response()->json(['error' => 'Invoice not found'], 404);
+            }
+            abort(404);
+        }
+    }
+    public function showForm()
+    {
+        return view('invoices.import');
+    }
+
+    public function importFromExcel(Request $request)
+    {
+        $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        try {
+            // Read the Excel file — first sheet only
+            $collection = Excel::toCollection(null, $request->file('excel_file'))->first();
+
+            if ($collection->isEmpty()) {
+                return back()->withErrors(['toast_error' => 'Excel file is empty.']);
+            }
+
+            // --- Convert Excel to associative array using headers from the first row ---
+            $headers = $collection->shift()->toArray();
+            $rows = $collection->map(function ($row) use ($headers) {
+                return collect($headers)->combine($row);
+            });
+
+            // --- Group rows by invoiceRefNo (1 invoice → many rows/items) ---
+            $grouped = $rows->groupBy('invoiceRefNo');
+            $successCount = 0;
+
+            DB::beginTransaction();
+
+            foreach ($grouped as $invoiceRef => $invoiceRows) {
+                $first = $invoiceRows->first();
+
+                // Create new Invoice as Draft
+                $invoice = Invoice::create([
+                    'invoice_type' => $first['invoiceType'] ?? 'Standard',
+                    'invoice_date' => $first['invoiceDate'] ?? now(),
+                    'due_date' => $first['due_date'] ?? null,
+                    'scenario_id' => $first['scenarioId'] ?? null,
+                    'invoice_ref_no' => $invoiceRef,
+                    'seller_id' => $first['seller_id'] ?? session('tenant_id'),
+                    'buyer_id' => $first['byr_id'] ?? 1,
+                    'totalAmountExcludingTax' => $first['totalAmountExcludingTax'] ?? 0,
+                    'totalAmountIncludingTax' => $first['totalAmountIncludingTax'] ?? 0,
+                    'totalSalesTax' => $first['totalSalesTax'] ?? 0,
+                    'totalfurtherTax' => $first['totalfurtherTax'] ?? 0,
+                    'totalextraTax' => $first['totalextraTax'] ?? 0,
+                    'shipping_charges' => $first['shipping_charges'] ?? 0,
+                    'other_charges' => $first['other_charges'] ?? 0,
+                    'discount_amount' => $first['discount_amount'] ?? 0,
+                    'payment_status' => $first['payment_status'] ?? null,
+                    'notes' => $first['notes'] ?? null,
+                    'invoice_status' => 1, // Draft
+                    'is_posted_to_fbr' => 0,
+                    'fbr_env' => getFbrEnv(),
+                ]);
+
+                // --- Create Invoice Line Items ---
+                foreach ($invoiceRows as $row) {
+                    InvoiceDetail::create([
+                        'invoice_id' => $invoice->invoice_id,
+                        'item_id' => $row['item_id'] ?? null,
+                        'quantity' => $row['quantity'] ?? 0,
+                        'total_value' => $row['totalValues'] ?? 0,
+                        'value_excl_tax' => $row['valueSalesExcludingST'] ?? 0,
+                        'retail_price' => $row['fixedNotifiedValueOrRetailPrice'] ?? 0,
+                        'sales_tax_applicable' => $row['SalesTaxApplicable'] ?? 0,
+                        'sales_tax_withheld' => $row['SalesTaxWithheldAtSource'] ?? 0,
+                        'extra_tax' => $row['extraTax'] ?? 0,
+                        'further_tax' => $row['furtherTax'] ?? 0,
+                        'fed_payable' => $row['fedPayable'] ?? 0,
+                        'discount' => $row['discount'] ?? 0,
+                        'sale_type' => $row['saleType'] ?? 'Normal',
+                        'sro_schedule_no' => $row['sroScheduleNo'] ?? '',
+                        'sro_item_serial_no' => $row['sroItemSerialNo'] ?? '',
+                    ]);
+                }
+
+                // --- Log activity ---
+                logActivity(
+                    'create',
+                    'Imported draft invoice via Excel: ' . ($invoice->invoice_ref_no ?? $invoice->invoice_id),
+                    $invoice->toArray(),
+                    $invoice->invoice_id,
+                    'invoices'
+                );
+
+                $successCount++;
+            }
+
+            DB::commit();
+
+            if ($successCount === 0) {
+                return back()->withErrors(['toast_error' => 'No invoices imported successfully. Please check Excel formatting.']);
+            }
+
+            return redirect()
+                ->route('invoices.index')
+                ->with('message', "{$successCount} invoice(s) imported successfully as drafts.");
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withErrors(['toast_error' => 'Import failed: ' . $e->getMessage()]);
+        }
+    }
+
     // public function importInvoice(Request $request)
     // {
     //     $request->validate([
@@ -594,28 +675,5 @@ class InvoiceController extends Controller
     //     }
     //     return back()->with('success', "$successCount invoice(s) processed and sent.");
     // }
-    public function download($id)
-    {
-        try {
-            $invoiceId = Crypt::decryptString($id);
-            $invoice = Invoice::with([
-                'buyer',
-                'seller',
-                'details.item'
-            ])->findOrFail($invoiceId);
 
-              $pdf = Pdf::loadView('invoices.download_invoice', ['invoice' => $invoice]);
-
-        // Return a response with PDF content and headers to display inline
-        return response($pdf->output(), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename="invoice.pdf"');
-
-        } catch (\Exception $e) {
-            if (request()->ajax()) {
-                return response()->json(['error' => 'Invoice not found'], 404);
-            }
-            abort(404);
-        }
-    }
 }

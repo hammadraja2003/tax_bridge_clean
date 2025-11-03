@@ -120,7 +120,7 @@
 
                                                 <td>
                                                     <button type="button"
-                                                        class="btn btn-xs btn-outline-secondary toggle-details"
+                                                        class="btn btn-xs btn-outline-success toggle-details"
                                                         data-bs-toggle="tooltip" title="Show Details">
                                                         <i class="fa fa-angle-right"></i>
                                                     </button>
@@ -130,16 +130,18 @@
                                                         title="Edit">
                                                         <i class="ti ti-edit"></i>
                                                     </a>
-
+                                                    
                                                     <form action="{{ route('buyers.delete', $buyer->byr_id) }}"
                                                         method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="button" class="btn btn-xs btn-outline-danger"
+                                                        <button type="button"
+                                                            class="btn btn-xs btn-outline-danger delete-button"
                                                             title="Delete">
                                                             <i class="ti ti-trash f-s-20"></i>
                                                         </button>
                                                     </form>
+
                                                 </td>
                                             </tr>
                                         @empty
@@ -192,7 +194,7 @@
 
                 tr.after(
                     `<tr class="details-row"><td colspan="${tr.children('td').length}" class="p-0">${detailsHtml}</td></tr>`
-                    );
+                );
             });
         });
     </script>

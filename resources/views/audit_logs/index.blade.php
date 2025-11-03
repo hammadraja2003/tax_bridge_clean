@@ -44,7 +44,7 @@
                                                 <td>{{ $log->user_name ?? $log->db_user }}</td>
                                                 <td>{{ $log->ip_address }}</td>
                                                 <td>{{ $log->device_info }}</td>
-                                                <td>{{ $log->changed_at }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($log->changed_at)->format('d-M-Y h:i:s A') }} 
                                                 <td>
                                                     @if ($log->tampered)
                                                         <span class="badge bg-danger">Tampered</span>

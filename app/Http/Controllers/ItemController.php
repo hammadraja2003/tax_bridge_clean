@@ -6,13 +6,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Item;
+use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
 {
     public function index()
     {
         $items = Item::latest()->paginate(10);
-        // Check for tampering
         foreach ($items as $item) {
             $calculatedHash = md5(
                 $item->item_hs_code .
@@ -78,7 +78,6 @@ class ItemController extends Controller
             $item = Item::findOrFail($id);
             $oldData = $item->toArray();
             $item->update($request->all());
-            // Log activity
             logActivity(
                 'update',
                 'Updated item: ' . $item->item_description,
@@ -104,14 +103,31 @@ class ItemController extends Controller
     public function delete($id)
     {
         $item = Item::findOrFail($id);
+        //  Check if this item is already used in any invoice detail
+        if ($item->invoiceDetails()->exists()) {
+            $validator = Validator::make([], []);
+            $validator->errors()->add(
+                'toast_error',
+                'Item "' . $item->item_description . '" cannot be deleted because it is already used in invoices.'
+            );
+
+            return redirect()
+                ->route('items.index')
+                ->withErrors($validator);
+        }
+        // Proceed with delete
+        $oldData = $item->toArray();
+        $item->delete();
         logActivity(
             'delete',
-            'Deleted item: ' . $item->item_description,
-            $item->toArray(),
-            $item->id,
+            'Deleted item: ' . $oldData['item_description'],
+            $oldData,
+            $id,
             'items'
         );
-        $item->delete();
-        return redirect()->route('items.index')->with('message', 'Item deleted successfully.');
+
+        return redirect()
+            ->route('items.index')
+            ->with('message', 'Item deleted successfully.');
     }
 }

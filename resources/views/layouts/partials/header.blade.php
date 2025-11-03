@@ -16,40 +16,10 @@
                                         <span class="badge bg-success me-2">Production Environment</span>
                                     @endif
                                 </div>
-                                {{-- <div class="header-searchbar">
-                                    @if (config('app.env') === 'local')
-                                        <span class="badge bg-info text-dark ms-2">
-                                            Tenant DB: {{ session('tenant_db') }}
-                                        </span>
-                                    @endif
-                                </div> --}}
                             </div>
                             <div class="col-6 d-flex align-items-center justify-content-end header-right">
                                 <ul class="d-flex align-items-center">
                                     <li class="header-search">
-                                        <a href="#" class="d-block head-icon" role=button
-                                            data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
-                                            aria-controls="offcanvasTop">
-                                            <i class="ti ti-search"></i>
-                                        </a>
-                                        <div class="offcanvas offcanvas-top search-canvas" tabindex="-1"
-                                            id="offcanvasTop">
-                                            <div class="offcanvas-body">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-grow-1">
-                                                        <form class="me-3 app-form app-icon-form " action="#">
-                                                            <div class="position-relative">
-                                                                <input type="search" class="form-control"
-                                                                    placeholder="Search..." aria-label="Search">
-                                                                <i class="ti ti-search f-s-15"></i>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </li>
                                     <li class="header-apps">
                                         <div class="flex-grow-1 ps-2">
@@ -101,8 +71,7 @@
                                                 @endif
                                                 <li class="app-divider-v dotted py-1"></li>
                                                 <li>
-                                                    <form method="POST" action="{{ route('logout') }}"
-                                                        id="logout-form">
+                                                    <form class="logout-form" method="POST" action="{{ route('logout') }}">
                                                         @csrf
                                                         <button type="submit"
                                                             class="dropdown-item d-flex align-items-center text-danger border-0 bg-transparent w-100 text-start">

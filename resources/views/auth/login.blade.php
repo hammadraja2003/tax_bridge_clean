@@ -10,7 +10,7 @@
             </div>
             <div class="col-lg-5 col-xl-4 p-0 bg-white">
                 <div class="form-container">
-                    <form class="app-form needs-validation" novalidate method="POST" action="{{ route('login') }}">
+                    <form class="app-form needs-validation" novalidate method="POST" action="{{ route('login.post') }}">
                         @csrf
                         <div class="row">
                             <div class="col-12">
@@ -39,7 +39,7 @@
                                         <input type="password" name="password" required class="form-control"
                                             placeholder="Enter Your Password" id="password">
                                         <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
-                                            <i class="fa fa-eye"></i>
+                                            <i class="ti ti-eye"></i>
                                         </span>
                                     </div>
                                     <div class="invalid-feedback">

@@ -127,19 +127,15 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
         'cloudwatch' => [
-            'driver' => 'custom',
-            'via' => \App\Logging\CreateCloudWatchLogger::class,
-            'region' => env('AWS_DEFAULT_REGION', 'ap-south-1'),
-            'credentials' => [
-                'key' => env('AWS_ACCESS_KEY_ID'),
-                'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            ],
-            'stream_name' => env('CLOUDWATCH_LOG_STREAM', 'laravel'),
-            'group_name' => env('CLOUDWATCH_LOG_GROUP', '/laravel/app'),
-            'retention' => env('CLOUDWATCH_RETENTION', 14),
+            'driver'  => 'custom',
+            'via'     => App\Logging\CloudWatchLoggerFactory::class,
+            'key'     => env('AWS_ACCESS_KEY_ID'),
+            'secret'  => env('AWS_SECRET_ACCESS_KEY'),
+            'region'  => env('AWS_DEFAULT_REGION', 'me-south-1'),
+            'group'   => env('CLOUDWATCH_LOG_GROUP', 'laravel-app'),
+            'stream'  => env('CLOUDWATCH_LOG_STREAM', 'laravel'),
+            'level'   => 'info',
         ],
-
-
     ],
 
 ];

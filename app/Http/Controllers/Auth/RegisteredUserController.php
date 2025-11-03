@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
-
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -15,7 +13,8 @@ use Illuminate\View\View;
 use App\Models\SandboxScenario;
 use App\Models\BusinessConfiguration;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserRegistarionMail;
 class RegisteredUserController extends Controller
 {
     /**
@@ -48,22 +47,18 @@ class RegisteredUserController extends Controller
             'bus_contact_person' => 'required|string|max:255',
             'bus_province' => 'required|string|max:50',
             'bus_address' => 'required|string|max:500',
-            'bus_logo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-
+            'bus_logo' => 'required|image|mimes:jpg,jpeg,png,svg|max:2048',
             // FBR / Config
             'fbr_env' => 'required|in:sandbox,production',
             'fbr_api_token_sandbox' => 'required|string',
             'fbr_api_token_prod' => 'nullable|string',
             'scenario_ids' => 'required|array',
-
             // User
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => 'required|string|min:6',
         ]);
-
         DB::beginTransaction();
-
         try {
             // grab only the keys we intend to persist
             $data = $request->only([
@@ -84,7 +79,6 @@ class RegisteredUserController extends Controller
                 'fbr_api_token_sandbox',
                 'fbr_api_token_prod'
             ]);
-
             $defaults = [
                 'bus_reg_num'         => 'N/A',
                 'bus_acc_branch_name' => 'N/A',
@@ -94,45 +88,36 @@ class RegisteredUserController extends Controller
                 'bus_IBAN'            => 'N/A',
                 'bus_swift_code'      => 'N/A',
             ];
-
             foreach ($defaults as $key => $value) {
                 if (!isset($data[$key]) || $data[$key] === null || $data[$key] === '') {
                     $data[$key] = $value;
                 }
             }
-
             if ($request->hasFile('bus_logo')) {
                 $disk   = env('FILESYSTEM_DISK', config('filesystems.default', 'uploads'));
                 $folder = 'company';
-
                 $file      = $request->file('bus_logo');
                 $extension = $file->getClientOriginalExtension();
                 $filename  = time() . '.' . $extension;
-
                 $path = Storage::disk($disk)->putFileAs($folder, $file, $filename);
                 $data['bus_logo'] = $path;
             } else {
                 // safe default if somehow missing (your validation requires it)
                 $data['bus_logo'] = $data['bus_logo'] ?? '';
             }
-
             // DB credentials & generated DB name
             $data['db_host'] = '127.0.0.1';
-            $data['db_username'] = 'root';
-            $data['db_password'] = 'Admin';
-
+            $data['db_username'] = 'dummy';
+            $data['db_password'] = 'dummy';
             $cleanBusName = strtolower($request->bus_name);
             $cleanBusName = preg_replace('/[^a-z0-9]+/i', '_', $cleanBusName);
             $cleanBusName = trim($cleanBusName, '_');
             $cleanBusName = preg_replace('/_+/', '_', $cleanBusName);
-
             $uniqueSuffix = substr(sha1(uniqid(mt_rand(), true)), 0, 6);
             $data['db_name'] = 'fbr_' . $cleanBusName . '_' . $uniqueSuffix . '_db';
-
             // Create business configuration (this will now always have bus_reg_num non-null)
             $business = BusinessConfiguration::create($data);
             $busConfigId = $business->bus_config_id;
-
             // Insert scenarios (many-to-many)
             if (!empty($request->scenario_ids)) {
                 foreach ($request->scenario_ids as $scenarioId) {
@@ -144,7 +129,6 @@ class RegisteredUserController extends Controller
                     ]);
                 }
             }
-
             // Create user
             $user = User::create([
                 'name' => $request->name,
@@ -152,15 +136,17 @@ class RegisteredUserController extends Controller
                 'tenant_id' => $busConfigId,
                 'email' => $request->email ?? null,
             ]);
-
+            $loginUrl = route('login');
+            Mail::to($user->email)->send(new UserRegistarionMail(
+                $user->name,
+                $user->email,
+                $loginUrl
+            ));
             event(new Registered($user));
-
             DB::commit();
-
-            return redirect()->route('login')->with('success', 'Configuration saved successfully! Please log in to continue.');
+            return redirect()->route('admin.businesses.index')->with('message', 'Configuration saved successfully! Please log in to continue.');
         } catch (\Exception $e) {
             DB::rollBack();
-
             return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
         }
     }

@@ -21,13 +21,13 @@
                                 <table id="projectTableT" class="table table-striped table-bordered m-0">
                                     <thead>
                                         <tr>
-                                            <th>Date/Time</th>
-                                            <th>Type</th>
-                                            <th>FBR ENV</th>
-                                            <th>Status Code</th>
-                                            <th>Status</th>
-                                            <th>Error Code</th>
-                                            <th>Error</th>
+                                            <th class="w-50">Date/Time</th>
+                                            <th class="w-50">Type</th>
+                                            <th class="w-50">FBR ENV</th>
+                                            <th class="w-50">Status Code</th>
+                                            <th class="w-50">Status</th>
+                                            <th class="w-50">Error Code</th>
+                                            <th class="w-50">Error</th>
                                             <th>Invoice Statuses</th>
                                             <th>Raw Response</th>
                                         </tr>

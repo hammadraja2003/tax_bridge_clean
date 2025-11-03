@@ -6,13 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class FbrPostError extends Model
 {
-    protected $connection = 'tenant';  // 👈 important
+    protected $connection = 'tenant';
     protected $table = 'fbr_post_errors';
-    protected $primaryKey = 'id'; // 👈 if table uses a custom PK, change it here
-    public $timestamps = false;   // 👈 we’re using error_time instead of default timestamps
-    // Allow mass assignment
+    protected $primaryKey = 'id';
+    public $timestamps = false;
     protected $guarded = [];
-    // Cast JSON fields and datetime properly
     protected $casts = [
         'invoice_statuses' => 'array',
         'raw_response'     => 'array',

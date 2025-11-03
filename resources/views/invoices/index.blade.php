@@ -143,7 +143,7 @@
 
                                                 <td class="actioncolumn">
                                                     <button type="button"
-                                                        class="btn btn-xs btn-outline-secondary toggle-details"
+                                                        class="btn btn-xs btn-outline-success toggle-details"
                                                         data-bs-toggle="tooltip" title="Show Details"><i
                                                             class="fa fa-angle-right"></i></button>
 
@@ -174,6 +174,18 @@
                                                             data-bs-toggle="tooltip" title="Edit Invoice">
                                                             <i class="fa-solid fa-pen-to-square"></i>
                                                         </a>
+
+                                                        <form
+                                                            action="{{ route('invoices.delete', $inv->invoice_id) }}"
+                                                            method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button"
+                                                                class="btn btn-outline-danger btn-xs delete-button"
+                                                                title="Delete Invoice">
+                                                                <i class="ti ti-trash f-s-18"></i>
+                                                            </button>
+                                                        </form>
                                                     @endif
 
 
@@ -371,7 +383,7 @@
 
                 tr.after(
                     `<tr class="details-row"><td colspan="${tr.children('td').length}" class="p-0">${detailsHtml}</td></tr>`
-                    );
+                );
             });
         });
     </script>
@@ -381,8 +393,7 @@
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     let invoiceId = this.getAttribute('data-invoice-id');
-                    let previewUrl = `/invoices/${invoiceId}/download`; // Your preview URL
-
+                    let previewUrl = `/invoices/${invoiceId}/download`;
                     // Set iframe src to load PDF
                     document.getElementById('invoicePreviewFrame').src = previewUrl;
 

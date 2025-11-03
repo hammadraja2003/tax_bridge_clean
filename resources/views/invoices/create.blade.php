@@ -93,7 +93,8 @@
                 <div class="card-body row g-3">
                     <div class="col-md-12">
                         <div class="py-2">
-                            <strong class="note-color">Note:</strong> If <em>Client Registration Type</em> is <strong>Unregistered</strong>,
+                            <strong class="note-color">Note:</strong> If <em>Client Registration Type</em> is
+                            <strong>Unregistered</strong>,
                             then all
                             fields
                             except <strong>Registration Type</strong> are optional.
@@ -167,7 +168,7 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="notes" class="form-label">Notes</label>
-                            <textarea id="notes" name="notes" rows="12" class="form-control"
+                            <textarea id="notes" name="notes" rows="8" class="form-control"
                                 placeholder="Additional comments or special instructions...">{{ old('notes', $isEdit ? $invoice->notes : '') }}</textarea>
                         </div>
                     </div>
@@ -188,7 +189,15 @@
                                 'payment_status' => 'Payment Status',
                             ];
                             $requiredFields = ['totalAmountExcludingTax', 'totalAmountIncludingTax', 'totalSalesTax'];
-                            $readOnlyFields = ['totalAmountExcludingTax', 'totalAmountIncludingTax', 'totalSalesTax' , 'totalfurtherTax' ,'totalextraTax' ,  'totalFedTax' , 'totalDiscount' ];
+                            $readOnlyFields = [
+                                'totalAmountExcludingTax',
+                                'totalAmountIncludingTax',
+                                'totalSalesTax',
+                                'totalfurtherTax',
+                                'totalextraTax',
+                                'totalFedTax',
+                                'totalDiscount',
+                            ];
                             $paymentStatusOptions = ['Pending', 'Partially Paid', 'Fully Paid'];
                         @endphp
                         @foreach ($fields as $id => $label)
@@ -202,9 +211,10 @@
                                 );
                             @endphp
                             <div class="mb-2 row align-items-center">
+                                 <div class="col-md-2"></div>
                                 <label for="{{ $id }}"
                                     class="col-md-5 col-form-label {{ $isRequired ? 'required' : '' }}">{{ $label }}</label>
-                                <div class="col-md-7">
+                                <div class="col-md-5">
                                     @if ($id === 'payment_status')
                                         <select id="{{ $id }}" name="{{ $id }}"
                                             class="form-control" {{ $isRequired ? 'required' : '' }}>
@@ -217,7 +227,8 @@
                                         </select>
                                     @else
                                         <input id="{{ $id }}" name="{{ $id }}" class="form-control"
-                                            value="{{ $value }}" {{ $isRequired ? 'required' : '' }}  {{ $isReadOnly ? 'readonly' : '' }}/>
+                                            value="{{ $value }}" {{ $isRequired ? 'required' : '' }}
+                                            {{ $isReadOnly ? 'readonly' : '' }} />
                                     @endif
                                 </div>
                             </div>
@@ -318,42 +329,39 @@
                         class="form-control" required />
                 </div>
                 <div class="col-md-3">
-                        <div class="row">
-                            <div class="col-md-6"> 
-                                <label class="form-label">Further Tax % </label>
-                                <input type="number" step="0.01" name="items[][furtherTax_percentage]" class="form-control" />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Further Tax <i class="bi bi-info-circle"
-                                        data-bs-toggle="tooltip"
-                                        title="If buyer is **unregistered**, FBR may require Further Tax (typically 3% or more). Optional but calculated if applicabl"></i></label>
-                                <input type="number" name="items[][furtherTax]" class="form-control" />
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Further Tax % </label>
+                            <input type="number" step="0.01" name="items[][furtherTax_percentage]"
+                                class="form-control" />
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Further Tax <i class="bi bi-info-circle" data-bs-toggle="tooltip"
+                                    title="If buyer is **unregistered**, FBR may require Further Tax (typically 3% or more). Optional but calculated if applicabl"></i></label>
+                            <input type="number" name="items[][furtherTax]" class="form-control" />
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-3">
-
-                 <div class="row">
-                            <div class="col-md-6"> 
-                                  <label class="form-label">Extra Tax % </label>
-                    <input type="number" step="0.01" name="items[][extraTax_percentage]" class="form-control" />
-                            </div>
-                            <div class="col-md-6">
-                               <label class="form-label">Extra Tax <i class="bi bi-info-circle" data-bs-toggle="tooltip"
-                            title=" Only applies to specific industries — e.g., sugar, cement. Leave blank if not applicable."></i></label>
-                    <input type="number" name="items[][extraTax]" class="form-control" />
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Extra Tax % </label>
+                            <input type="number" step="0.01" name="items[][extraTax_percentage]"
+                                class="form-control" />
                         </div>
-
-                  
-                </div>  
+                        <div class="col-md-6">
+                            <label class="form-label">Extra Tax <i class="bi bi-info-circle" data-bs-toggle="tooltip"
+                                    title=" Only applies to specific industries — e.g., sugar, cement. Leave blank if not applicable."></i></label>
+                            <input type="number" name="items[][extraTax]" class="form-control" />
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-3">
                     <label class="form-label">FED Payable %</label>
                     <input type="number" step="0.01" name="items[][fedPayable_percentage]" class="form-control" />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">FED Payable <i class="bi bi-info-circle"
-                            data-bs-toggle="tooltip"
+                    <label class="form-label">FED Payable <i class="bi bi-info-circle" data-bs-toggle="tooltip"
                             title="Federal Excise Duty — applicable in certain services/goods (e.g., telecom, beverages). 0 if not applicable."></i></label>
                     <input type="number" name="items[][fedPayable]" class="form-control" />
                 </div>
@@ -369,18 +377,15 @@
                     <input type="number" name="items[][discount]" class="form-control" />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">SRO Schedule No <i class="bi bi-info-circle"
-                            data-bs-toggle="tooltip"
+                    <label class="form-label">SRO Schedule No <i class="bi bi-info-circle" data-bs-toggle="tooltip"
                             title="Optional: Relevant only if item has special treatment via an SRO (Statutory Regulatory Order)"></i></label>
                     <input type="text" name="items[][sroScheduleNo]" class="form-control" />
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">SRO Item Serial No  <i class="bi bi-info-circle"
-                            data-bs-toggle="tooltip"
+                    <label class="form-label">SRO Item Serial No <i class="bi bi-info-circle" data-bs-toggle="tooltip"
                             title="Optional: Used if your item appears in an SRO Schedule and has a specific serial number."></i></label>
                     <input type="text" name="items[][sroItemSerialNo]" class="form-control" />
                 </div>
-                
                 <div class="col-md-3">
                     <label class="form-label required">Tax Withheld <i class="bi bi-info-circle" data-bs-toggle="tooltip"
                             title="If you're withholding tax on behalf of the seller (as a withholding agent), mention here Else 0."></i></label>
@@ -401,6 +406,9 @@
     </script>
     <script nonce="{{ $nonce }}">
         window.buyerId = "{{ $invoice->buyer_id ?? '' }}";
+        document.getElementById('buyerRegistrationType').addEventListener('mousedown', function(e) {
+            e.preventDefault();
+        });
     </script>
     <script src="{{ asset('assets/js/customInvoice.js') }}"></script>
 @endsection

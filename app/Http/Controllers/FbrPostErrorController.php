@@ -14,7 +14,7 @@ class FbrPostErrorController extends Controller
      */
     public function showErrors()
     {
-        $fbr_errors = FbrPostError::orderByDesc('created_at')->paginate(10);
+        $fbr_errors = FbrPostError::orderByDesc('id')->paginate(10);
         return view('invoices.fbr_post_error', compact('fbr_errors'));
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Item extends Model
 {
     use HasFactory;
-    protected $connection = 'tenant';  // 👈 important
+    protected $connection = 'tenant'; 
     protected $primaryKey = 'item_id';
     protected $fillable = [
         'item_hs_code',

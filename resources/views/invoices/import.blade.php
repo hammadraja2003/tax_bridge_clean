@@ -32,8 +32,8 @@
         <form action="{{ route('invoices.import.process') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
-                <label for="invoice_file" class="form-label">Upload Excel File (.xlsx)</label>
-                <input type="file" name="invoice_file" id="invoice_file" class="form-control" accept=".xlsx" required>
+                <label for="excel_file" class="form-label">Upload Excel File (.xlsx)</label>
+                <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xlsx" required>
             </div>
             <div class="mb-3">
                 <label for="send_to_fbr" class="form-label">Send to FBR after saving?</label>

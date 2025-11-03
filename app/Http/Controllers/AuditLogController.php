@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Crypt;
 
 class AuditLogController extends Controller
 {
-    /**
-     * Display audit logs with details.
-     */
     public function index(Request $request)
     {
         $logs = AuditLog::with('user')
@@ -33,7 +30,7 @@ class AuditLogController extends Controller
         try {
             $id = Crypt::decrypt($encryptedId);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            abort(404); // invalid or tampered ID
+            abort(404); 
         }
         $log = AuditLog::findOrFail($id);
         $calculatedOldHash = $log->old_data ? hash('sha256', json_encode($log->old_data)) : null;

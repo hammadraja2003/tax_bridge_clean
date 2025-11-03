@@ -13,6 +13,9 @@ class SetTenant
     }
     public function handle($request, Closure $next)
     {
+        if ($request->is('login') || $request->is('password/*') || $request->is('company/configuration*')) {
+            return $next($request);
+        }
         $tenantManager = app(\App\Services\TenantManager::class);
         $tenantId = Auth::user()->tenant_id ?? session('tenant_id');
         if ($tenantId) {
@@ -22,7 +25,6 @@ class SetTenant
                 ->first();
             if ($business) {
                 $dbName = $business->db_name;
-                // ✅ Check if database actually exists
                 $dbExists = DB::select("SHOW DATABASES LIKE '{$dbName}'");
                 if (empty($dbExists)) {
                     Auth::logout();
@@ -31,12 +33,12 @@ class SetTenant
                             'db' => "Your tenant database has not been created yet. Please contact admin."
                         ]);
                 }
-                // If DB exists → proceed normally
                 $tenantManager->setTenant($business->bus_config_id);
                 session([
                     'tenant_id'     => $tenantId,
                     'bus_config_id' => $business->bus_config_id,
                     'tenant_db'     => $business->db_name,
+                    'bus_name'     => $business->bus_name,
                 ]);
             }
         }

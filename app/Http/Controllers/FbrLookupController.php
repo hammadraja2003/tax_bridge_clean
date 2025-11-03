@@ -1,22 +1,17 @@
 <?php
 namespace App\Http\Controllers;
-
 use App\Services\FbrInvoiceService;
 use Illuminate\Http\Request;
-
 class FbrLookupController extends Controller
 {
     protected FbrInvoiceService $fbr;
-
     public function __construct(FbrInvoiceService $fbr)
     {
         $this->fbr = $fbr;
     }
-
     public function fetch(Request $request)
     {
         $type = $request->input('type');
-
         switch ($type) {
             case 'provinces':
                 $response = $this->fbr->getProvinces();
@@ -54,11 +49,9 @@ class FbrLookupController extends Controller
             case 'regtype':
                 $response = $this->fbr->getRegType($request->all());
                 break;
-
             default:
                 $response = ['success' => false, 'error' => 'Invalid type'];
         }
-
         return response()->json($response);
     }
 }

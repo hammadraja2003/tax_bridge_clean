@@ -3,11 +3,11 @@
     color: red;
 }
 .text-secureism {
-    color: #ba2331;
+    color: #0fbc66;
 }
 
 .activeTab {
-    background: #056464;
+    background: #1d61d8;
 }
 .app-logo {
     /* background-color: #bc202e; */
@@ -97,10 +97,10 @@ footer .d-flex.flex-column {
     padding-left: 0.5rem !important;
     border-radius: 3px !important;
 }
-.btn-primary {
+/* .btn-primary {
     --bs-btn-bg: #056464 !important;
     --bs-btn-border-color: #056464 !important;
-}
+} */
 
 .dark-sidebar {
     width: 250px;
@@ -108,7 +108,7 @@ footer .d-flex.flex-column {
     position: fixed;
     left: 0;
     top: 0;
-    background-color: #111827;
+    background-color: #d3d6e1;
     transition: all 0.3s ease;
     z-index: 1050;
 }
@@ -166,4 +166,23 @@ a.btn.btn-xs.btn-outline-warning {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+}
+li.active a.activeTab {
+    color: #fff !important;
+}
+nav .app-nav .main-nav > li:not(.menu-title) ul li:before {
+    content: "-";
+    position: absolute;
+    left: 30px;
+    font-size: 20px;
+    top: 0;
+    color: rgb(0 0 0);
+}nav .app-logo {
+    padding: 0.5rem 1.5rem 0;
+}
+.card .card-header, .card .card-footer {
+    background-color: #0d6efd1f;
+}
+.dark-sidebar { 
+    background-color: #0d6efd1f; 
 }

@@ -30,12 +30,13 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             labels: names,
             colors: [
-                getLocalStorageItem("color-primary", "#056464"),
-                getLocalStorageItem("color-secondary", "#74788D"),
-                "#0FB450",
-                "#EA5659",
-                "#FAC10F",
+                getLocalStorageItem("color-primary", "#1d61d8"), // bold brand blue
+                getLocalStorageItem("color-secondary", "#0fbc66"), // vivid brand green
+                "#f39c12", // warm amber / orange for contrast
+                "#92f4c3ff", // red accent (good for negative or warning data)
+                "#6b9aecff", // purple accent for neutral/other data
             ],
+
             legend: {
                 position: "bottom",
                 show: true,
@@ -73,7 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //  **------pie_charts 2**
 
-
 document.addEventListener("DOMContentLoaded", function () {
     if (typeof window.topServicesRevenueData !== "undefined") {
         const names = window.topServicesRevenueData.names || [];
@@ -95,12 +95,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     colors: "#333",
                 },
             },
+
             colors: [
-                "#F59E0B",
-                "#10B981",
-                "#8B5CF6",
-                getLocalStorageItem("color-primary", "#056464"),
-                getLocalStorageItem("color-secondary", "#74788D"),
+                getLocalStorageItem("color-primary", "#1d61d8"), // bold brand blue
+                getLocalStorageItem("color-secondary", "#0fbc66"), // vivid brand green
+                "#f39c12", // warm amber / orange for contrast
+                "#92f4c3ff", // red accent (good for negative or warning data)
+                "#6b9aecff", // purple accent for neutral/other data
             ],
             tooltip: {
                 y: {

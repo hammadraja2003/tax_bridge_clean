@@ -34,7 +34,7 @@
                                     <tbody class="list" id="t-data">
                                         @forelse($logs as $log)
                                             <tr @if ($log->hash_changed) class="table-warning" @endif>
-                                                <td class="date">{{ $log->created_at->format('d-M-Y H:i:s') }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($log->created_at)->format('d-M-Y h:i:s A') }} 
                                                 <td class="email">{{ $log->user_name ?? 'System' }}</td>
                                                 <td class="email">{{ $log->ip_address }}</td>
                                                 <td class="contact">{{ $log->device_id ?? '-' }}</td>

@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class AuditLog extends Model
 {
-    protected $connection = 'tenant';  // 👈 important
+    protected $connection = 'tenant'; 
     protected $table = 'audit_logs';
     protected $primaryKey = 'audit_id';
-    public $timestamps = false; // You already have changed_at, so disable default timestamps
+    public $timestamps = false;
     protected $fillable = [
         'table_name',
         'row_id',
@@ -28,7 +28,6 @@ class AuditLog extends Model
         'new_data' => 'array',
         'changed_at' => 'datetime',
     ];
-    // 👇 This makes $log->changes auto-available in JSON/Blade
     protected $appends = ['changes'];
     /**
      * Compute field-wise changes between old_data and new_data
@@ -48,13 +47,11 @@ class AuditLog extends Model
         }
         return $changes;
     }
-    // 👇 Relation to Master DB User (by email)
     public function user()
     {
         return $this->setConnection('master')
             ->belongsTo(User::class, 'db_user', 'email');
     }
-    // 👇 Scope for newest-first ordering
     public function scopeLatestFirst($query)
     {
         return $query->orderBy('changed_at', 'desc');

@@ -26,10 +26,11 @@ var options = {
         },
     },
     colors: [
-        getLocalStorageItem("color-primary", "#056464"),
-        getLocalStorageItem("color-secondary", "#74788D"),
-        "#0FB450",
+        getLocalStorageItem("color-primary", "#1d61d8"),
+        getLocalStorageItem("color-secondary", "#0fbc66"),
+        "#f39c12",
     ],
+
     dataLabels: {
         enabled: false,
     },
@@ -61,14 +62,11 @@ var options = {
 var chart = new ApexCharts(document.querySelector("#column1"), options);
 chart.render();
 
-
 document.addEventListener("DOMContentLoaded", function () {
     const data = invoiceMonthlyStats;
 
     if (data.series.length === 0) {
-        data.series = [
-            { name: "No Data", data: Array(12).fill(0) }
-        ];
+        data.series = [{ name: "No Data", data: Array(12).fill(0) }];
     }
 
     var options = {
@@ -86,7 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
         xaxis: {
             categories: data.months,
         },
-        colors: ["#0090FF", "#00E396"], // blue for created, green for posted
+        colors: ["#1d61d8", "#0fbc66"],
+
         legend: {
             position: "bottom",
             offsetY: 10,

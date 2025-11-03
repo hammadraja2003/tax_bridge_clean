@@ -10,6 +10,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "aporat/laravel-cloudwatch-logger": "^1.0",
+        "async-aws/monolog-cloud-watch": "^1.2",
         "aws/aws-sdk-php": "^3.356",
         "barryvdh/laravel-dompdf": "^3.1",
         "endroid/qr-code": "^5.0",
@@ -17,16 +19,15 @@
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.29",
         "maatwebsite/excel": "^3.1",
-        "maxbanton/cwh": "^2.0",
         "pragmarx/google2fa": "^8.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
-        "webfox/laravel-xero-oauth2": "6.1",
-        "xeroapi/xero-php-oauth2": "8.1"
+        "vlucas/phpdotenv": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
         "enlightn/security-checker": "^2.0",
         "fakerphp/faker": "^1.23",
+        "icanhazstring/composer-unused": "^0.9.5",
         "laravel/breeze": "^2.3",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.13",

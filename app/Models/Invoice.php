@@ -1,17 +1,14 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 class Invoice extends Model
 {
     use HasFactory;
     public const STATUS_DRAFT  = 1;
     public const STATUS_POSTED = 2;
-    protected $connection = 'tenant';  // 👈 important
-    protected $table = 'invoices';     // 👈 add for clarity
+    protected $connection = 'tenant';
+    protected $table = 'invoices';
     protected $primaryKey = 'invoice_id';
     protected $fillable = [
         'invoice_type',
@@ -112,13 +109,24 @@ class Invoice extends Model
     // 🚨 Tamper detection
     public function isTampered(): bool
     {
+        // Don't check tampering for drafts
+        if ($this->invoice_status == self::STATUS_DRAFT) {
+            return false;
+        }
         return $this->generateHash() !== $this->hash;
     }
-    // 🔄 Auto-update hash
     protected static function booted()
     {
         static::saving(function (self $invoice) {
-            $invoice->hash = $invoice->generateHash();
+            if ($invoice->exists) {
+                $invoice->hash = $invoice->generateHash();
+            }
+        });
+        static::saved(function (self $invoice) {
+            if (!$invoice->hash) {
+                $invoice->hash = $invoice->generateHash();
+                $invoice->saveQuietly();
+            }
         });
     }
 }

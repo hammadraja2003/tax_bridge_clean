@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class InvoiceDetail extends Model
 {
     use HasFactory;
-    protected $connection = 'tenant';  // 👈 important
+    protected $connection = 'tenant'; 
     protected $primaryKey = 'invoice_detail_id';
     protected $fillable = [
         'invoice_id',
@@ -37,7 +37,6 @@ class InvoiceDetail extends Model
     {
         return $this->belongsTo(Item::class, 'item_id', 'item_id');
     }
-    // 🔐 Generate hash for detail-level integrity check
     public function generateHash(): string
     {
         $fields = [
@@ -85,7 +84,6 @@ class InvoiceDetail extends Model
         $current = $this->generateHash();
         return $current !== $this->hash;
     }
-    // 🔄 Automatically update hash on create/update
     protected static function booted()
     {
         static::saving(function (self $detail) {

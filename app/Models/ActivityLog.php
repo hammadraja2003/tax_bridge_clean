@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ActivityLog extends Model
 {
-    protected $connection = 'tenant';  // 👈 important
+    protected $connection = 'tenant';  
     protected $table = 'activity_logs';
-    // ✅ allow mass assignment
     protected $fillable = [
         'user_id',
         'user_name',
@@ -24,9 +23,8 @@ class ActivityLog extends Model
         'created_at',
     ];
     protected $casts = [
-        'data' => 'array', // ensures $log->data is automatically decoded from JSON
+        'data' => 'array', 
     ];
-    // This will allow us to access $log->diff in Blade
     protected $appends = ['diff'];
     public function getDiffAttribute()
     {

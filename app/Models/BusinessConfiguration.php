@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class BusinessConfiguration extends Model
 {
     use HasFactory;
-    // 🔹 This model belongs to master DB
     protected $connection = 'master';
     protected $primaryKey = 'bus_config_id';
     protected $fillable = [
@@ -37,7 +36,7 @@ class BusinessConfiguration extends Model
     ];
     public function invoices()
     {
-        return $this->hasMany(Invoice::class, 'seller_id', 'bus_config_id'); // ✅
+        return $this->hasMany(Invoice::class, 'seller_id', 'bus_config_id');
     }
     public function scenarios()
     {
@@ -48,7 +47,6 @@ class BusinessConfiguration extends Model
             'scenario_id'
         )->withTimestamps();
     }
-    // 🔑 Auto-hash on create/update
     protected static function booted()
     {
         static::creating(function ($config) {
@@ -58,7 +56,6 @@ class BusinessConfiguration extends Model
             $config->hash = $config->generateHash();
         });
     }
-    // ✅ Generate hash from critical fields
     public function generateHash()
     {
         return md5(

@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www
+      - ./.env:/var/www/.env   
+    environment:
+      APP_DEBUG: true
+      SESSION_DRIVER: database
+      APP_ENV: local
+      DB_CONNECTION: master
+      DB_HOST: db       
+      DB_PORT: 3306
+      DB_DATABASE: master_db
+      DB_USERNAME: root
+      DB_PASSWORD:             
+    depends_on:
+      - db
+    networks:
+      - fbr
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"   
+      MYSQL_DATABASE: master_db
+     
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - fbr
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD:             
+      UPLOAD_LIMIT: 256M
+    networks:
+      - fbr
+
+volumes:
+  mysql_data:
+
+networks:
+  fbr:
+    driver: bridge

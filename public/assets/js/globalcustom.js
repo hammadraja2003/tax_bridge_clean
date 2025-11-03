@@ -66,10 +66,17 @@ function initPasswordToggle() {
 document.addEventListener("click", function (e) {
     if (e.target.closest("#logout-link")) {
         e.preventDefault();
-        const logoutForm = document.getElementById("logout-form");
-        if (logoutForm) logoutForm.submit();
+
+        // Select *all* logout forms by class
+        const logoutForms = document.querySelectorAll(".logout-form");
+
+        // Pick the nearest one to the clicked link (if any)
+        const nearestForm = e.target.closest("li")?.querySelector(".logout-form") || logoutForms[0];
+
+        if (nearestForm) nearestForm.submit();
     }
 });
+
 // custom.js
 document.addEventListener("DOMContentLoaded", function () {
     // Select all alert messages

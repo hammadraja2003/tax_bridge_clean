@@ -30,9 +30,8 @@ class Buyer extends Model
     ];
     public function invoices()
     {
-        return $this->hasMany(Invoice::class, 'buyer_id', 'byr_id'); // ✅
+        return $this->hasMany(Invoice::class, 'buyer_id', 'byr_id'); 
     }
-    // 🔑 Auto-generate hash
     protected static function booted()
     {
         static::creating(function ($buyer) {
@@ -42,7 +41,6 @@ class Buyer extends Model
             $buyer->hash = $buyer->generateHash();
         });
     }
-    // ✅ Generate hash from critical fields
     public function generateHash()
     {
         return md5(

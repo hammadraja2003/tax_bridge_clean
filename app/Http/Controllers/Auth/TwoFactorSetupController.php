@@ -11,18 +11,20 @@ class TwoFactorSetupController extends Controller
     // Show the 2FA setup page
     public function showSetupForm()
     {
+       
         $user = Auth::user();
         $google2fa = new Google2FA();
         // If user has never set up 2FA, redirect to profile to start setup
         if (!$user->twofa_secret) {
-            $encryptedId = Crypt::encrypt($user->id);
-            return redirect()->route('edit-profile', $encryptedId)
-                ->with('status', 'You need to set up Two-Factor Authentication first.');
+            $google2fa = new Google2FA();
+            $user->twofa_secret = $google2fa->generateSecretKey();
+            $user->save();
         }
         // Use existing secret
         $secret = $user->twofa_secret;
+        $busName = session('bus_name', 'TaxBridgeInvoiceManagment');
         $otpauth = $google2fa->getQRCodeUrl(
-            'SecureismInvoiceManagment',
+            $busName,
             $user->email,
             $secret
         );

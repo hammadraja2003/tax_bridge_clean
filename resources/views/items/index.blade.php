@@ -58,7 +58,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button"
-                                                            class="btn btn-xs btn-outline-danger">
+                                                            class="btn btn-xs btn-outline-danger delete-button">
                                                             <i class="ti ti-trash f-s-20"></i>
                                                         </button>
                                                     </form>

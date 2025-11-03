@@ -132,12 +132,6 @@
                             @enderror
                         </div>
                         @if (!empty($config->bus_logo))
-                            {{-- <div class=" col-md-4">
-                                <label class="form-label">Company
-                                    Logo</label>
-                                <img src="{{ asset('uploads/company/' . $config->bus_logo) }}" alt="Company Logo"
-                                    style="max-width: 200px; height: auto; border: 1px solid #ddd; padding: 5px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                            </div> --}}
                             <div class="col-md-4">
                                 <label class="form-label">Company Logo</label>
                                 @if (!empty($config->bus_logo))
@@ -270,7 +264,7 @@
                         <h5 class="fw-bold border-bottom pb-2 mb-3">Configuration Settings</h5>
                     </div>
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        {{-- <div class="col-md-4">
                             <label class="form-label required">Database Host</label>
                             <input type="text" name="db_host" class="form-control" placeholder="Enter DB Host"
                                 value="{{ old('db_host', $config->db_host ?? '') }}" required>
@@ -307,7 +301,7 @@
                             @error('db_password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                        </div>
+                        </div> --}}
                         <div class="col-md-4">
                             <label class="form-label required">FBR Environment</label>
                             <select name="fbr_env" class="form-select" required>
