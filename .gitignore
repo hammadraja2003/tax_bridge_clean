@@ -10,7 +10,6 @@
 /bootstrap/cache/*.php
  
 # Public uploads (user-generated, DB dumps, postman collections)
-public/DB
 public/postman collections
 public/uploads
  
