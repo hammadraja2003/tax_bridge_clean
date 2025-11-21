@@ -1,66 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+TaxBridge
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
 
-## About Laravel
+📌 Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+TaxBridge is a modern, end‑to‑end tax invoicing and compliance platform designed to help Pakistani businesses create, manage, validate, and submit invoices seamlessly. The platform follows FBR e‑Invoicing guidelines and provides a user‑friendly way for businesses to automate their tax workflows.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+TaxBridge acts as a bridge between businesses and the FBR invoicing ecosystem, offering reliability, transparency, real‑time validation, and automated processes to reduce manual effort.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+🚀 Key Features
+✔ Invoice Management
 
-## Learning Laravel
+Create, edit, and manage sales invoices.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Auto‑calculation of tax amounts.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Support for multiple invoice scenarios.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Buyer & seller profiles with NTN/STRN validation.
 
-## Laravel Sponsors
+✔ Real‑Time FBR Integration
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Connects with FBR APIs for invoice submission.
 
-### Premium Partners
+Real‑time response handling (IRN, QR, validation messages).
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Error handling and retry mechanisms.
 
-## Contributing
+✔ Business & Package Management
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Multi‑business support under one account.
 
-## Code of Conduct
+Subscription packages with business features.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Trials, active/inactive package states.
 
-## Security Vulnerabilities
+Auto‑tracking of feature usage.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+✔ API Support for Mobile Apps
 
-## License
+Mobile‑friendly API endpoints for Flutter‑based apps.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Two‑factor authentication (2FA) support.
+
+API token & session security.
+
+✔ Smart Dashboard
+
+Invoice status overview.
+
+Recent activity logs.
+
+Insights into tax amounts, buyers, and sellers.
+
+✔ Advanced Features
+
+QR code generation.
+
+Error‑resistant invoice schema.
+
+Buyer search, filtering, and type‑based categorization.
+
+Handling complex invoice scenarios.
+
+Notifications & logs.
+
+🧩 Tech Stack
+
+Backend: Laravel 12
+
+Frontend / Web: (Add your stack if the web UI exists)
+
+Mobile: Flutter App (integrated via REST API)
+
+Database: MySQL
+
+Auth: Passport / Sanctum (based on your implementation)
+
+DevOps: AWS SES (email), server‑based deployment
+
+📚 API Capabilities
+
+TaxBridge exposes multiple secure REST APIs:
+
+Authentication (login, token flow, 2FA)
+
+Buyer & seller management
+
+Invoice creation, update, validation
+
+FBR submission handler
+
+Feature usage tracking
+
+Package management and access‑control enforcement
+
+🔐 Security & Permissions
+
+Role & permission‑based access control.
+
+Package‑level feature restrictions.
+
+API rate limiting.
+
+Secure invoice submission via validated schemas.
+
+🎯 Goal of the Project
+
+TaxBridge was built to simplify e‑invoicing for businesses in Pakistan by offering:
+
+A centralized system for invoice compliance.
+
+Automation of business tasks.
+
+Easy integration for mobile & external systems.
+
+Error‑free alignment with FBR requirements.
+
+📞 Contact
+
+For updates or improvements, feel free to reach out or request enhancements.
