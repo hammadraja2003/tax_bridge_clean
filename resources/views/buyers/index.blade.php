@@ -130,11 +130,12 @@
                                                         title="Edit">
                                                         <i class="ti ti-edit"></i>
                                                     </a>
-                                                    
-                                                    <form action="{{ route('buyers.delete', $buyer->byr_id) }}"
-                                                        method="POST" class="d-inline">
+
+                                                    <form action="{{ route('buyers.delete') }}" method="POST"
+                                                        class="d-inline">
                                                         @csrf
-                                                        @method('DELETE')
+                                                        <input type="hidden" name="byr_id"
+                                                            value="{{ \Illuminate\Support\Facades\Crypt::encryptString($buyer->byr_id) }}" />
                                                         <button type="button"
                                                             class="btn btn-xs btn-outline-danger delete-button"
                                                             title="Delete">

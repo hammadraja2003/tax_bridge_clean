@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BusinessController;
 use App\Http\Controllers\Admin\LogController;
 use App\Http\Controllers\Admin\DatabaseController;
+use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Admin\BusinessPackageController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
 Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
@@ -29,6 +31,10 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('businesses', [BusinessController::class, 'index'])->name('businesses.index');
         Route::get('businesses/{id}', [BusinessController::class, 'show'])->name('businesses.show');
 
+        Route::get('businesses/createuser/{id}', [BusinessController::class, 'createUser'])->name('businesses.create-user');
+        Route::post('businesses/registeruser', [BusinessController::class, 'registerUser'])->name('businesses.register');
+
+
         // Log Management
         Route::get('logs', [LogController::class, 'show'])->name('logs.show');
         Route::get('logs/clear', [LogController::class, 'clear'])->name('logs.clear');
@@ -36,6 +42,28 @@ Route::middleware(['web'])->prefix('admin')->name('admin.')->group(function () {
         // Database Utilities
         Route::get('db/clone', [DatabaseController::class, 'showCloneForm'])->name('db.clone.form');
         Route::post('db/clone', [DatabaseController::class, 'clone'])->name('db.clone');
+
+        //Packages
+        Route::prefix('packages')->name('packages.')->group(function () {
+            Route::get('/', [PackageController::class, 'index'])->name('index');
+            Route::get('/create', [PackageController::class, 'create'])->name('create');
+            Route::post('/', [PackageController::class, 'store'])->name('store');
+            Route::get('/{package}/edit', [PackageController::class, 'edit'])->name('edit');
+            Route::put('/{package}', [PackageController::class, 'update'])->name('update');
+            Route::delete('/{package}', [PackageController::class, 'destroy'])->name('destroy');
+        });
+
+        //Package Assignment
+        Route::get('business-packages/assign', [BusinessPackageController::class, 'showAssignForm'])
+            ->name('business_packages.assign.form');
+        Route::post('business-packages/assign', [BusinessPackageController::class, 'assignPackage'])
+            ->name('business_packages.assign');
+        Route::get('business-packages', [BusinessPackageController::class, 'index'])
+            ->name('business_packages.index');
+        Route::post('business-packages/renew', [BusinessPackageController::class, 'renew'])
+            ->name('business_packages.renew');
+        Route::post('business_packages/toggle', [BusinessPackageController::class, 'toggleActive'])
+            ->name('business_packages.toggle');
     });
 });
 

@@ -55,7 +55,7 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceDetail::class, 'invoice_id', 'invoice_id');
     }
-    // 🔑 Hash generation
+    // Hash generation
     public function generateHash(): string
     {
         $fields = [
@@ -106,7 +106,7 @@ class Invoice extends Model
             json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
         );
     }
-    // 🚨 Tamper detection
+    // Tamper detection
     public function isTampered(): bool
     {
         // Don't check tampering for drafts

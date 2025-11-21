@@ -1,11 +1,14 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
+
 class ResetPasswordController extends Controller
 {
     // Show reset password form
@@ -33,8 +36,22 @@ class ResetPasswordController extends Controller
                 event(new PasswordReset($user));
             }
         );
+        if (isApiRequest()) {
+            if ($status === Password::PASSWORD_RESET) {
+                return successResponse(
+                    [],
+                    200,
+                    __($status) 
+                );
+            }
+
+            return errorResponse(
+                __($status),
+                400
+            );
+        }
         return $status === Password::PASSWORD_RESET
-                    ? redirect()->route('login')->with('status', __($status))
-                    : back()->withErrors(['email' => [__($status)]]);
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
     }
 }

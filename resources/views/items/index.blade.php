@@ -53,7 +53,7 @@
                                                         class="btn btn-xs btn-outline-warning">
                                                         <i class="ti ti-edit"></i>
                                                     </a>
-                                                    <form action="{{ route('items.delete', $item->item_id) }}"
+                                                    {{-- <form action="{{ route('items.delete', $item->item_id) }}"
                                                         method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
@@ -61,7 +61,20 @@
                                                             class="btn btn-xs btn-outline-danger delete-button">
                                                             <i class="ti ti-trash f-s-20"></i>
                                                         </button>
+                                                    </form> --}}
+
+                                                    <form action="{{ route('items.delete') }}" method="POST"
+                                                        class="d-inline">
+                                                        @csrf
+                                                        <input type="hidden" name="item_id"
+                                                            value="{{ \Illuminate\Support\Facades\Crypt::encryptString($item->item_id) }}" />
+                                                        <button type="button"
+                                                            class="btn btn-xs btn-outline-danger delete-button"
+                                                            title="Delete">
+                                                            <i class="ti ti-trash f-s-20"></i>
+                                                        </button>
                                                     </form>
+
                                                 </td>
                                             </tr>
                                         @empty

@@ -6,8 +6,10 @@
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-        <form class="app-form needs-validation" method="POST" action="{{ route('items.update', $item->item_id) }}">
+        <form class="app-form needs-validation" method="POST" action="{{ route('items.update') }}">
             @csrf
+             <input type="hidden" name="item_id"
+                value="{{ \Illuminate\Support\Facades\Crypt::encryptString($item->item_id) }}" />
             <div class="card mb-4">
                 <div class="card-body row g-3">
                     {{-- Item Description --}}

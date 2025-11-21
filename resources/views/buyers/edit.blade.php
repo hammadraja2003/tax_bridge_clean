@@ -3,9 +3,11 @@
     @include('layouts.partials.errors')
     <div class="container-fluid">
         <h2 class="mb-4 text-center">Edit Client</h2>
-        <form class="app-form needs-validation" novalidate method="POST" action="{{ route('buyers.update', $buyer->byr_id) }}"
+        <form class="app-form needs-validation" novalidate method="POST" action="{{ route('buyers.update') }}"
             enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="byr_id"
+                value="{{ \Illuminate\Support\Facades\Crypt::encryptString($buyer->byr_id) }}" />
             <div class="card mb-4">
                 <div class="card-body row g-3">
                     {{-- Client Name --}}

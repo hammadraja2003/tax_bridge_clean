@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\BuyerResource;
 
 class BuyerController extends Controller
 {
@@ -31,6 +32,10 @@ class BuyerController extends Controller
             $calculatedHash = $buyer->generateHash();
             $buyer->tampered = $calculatedHash !== $buyer->hash;
         }
+        if (isApiRequest()) {
+            $buyersResponse = BuyerResource::collection($buyers);
+            return successResponse($buyersResponse,  200 , 'Buyers Data Fetched');
+        }
         return view('buyers.index', compact('buyers'));
     }
     public function fetch($id)
@@ -43,43 +48,54 @@ class BuyerController extends Controller
     }
     public function store(Request $request)
     {
+        $isApiRequest = isApiRequest();
+        $rules = [
+            'byr_name' => 'required|string|max:255',
+            'byr_type' => 'required|integer',
+            'byr_id_type' => [
+                'nullable',
+                'required_if:byr_type,1',
+                'in:NTN,CNIC'
+            ],
+            'byr_ntn_cnic' => [
+                'nullable',
+                'required_if:byr_type,1',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->byr_id_type === 'NTN' && !preg_match('/^[0-9]{7}$/', $value)) {
+                        $fail('Client NTN must be exactly 7 digits.');
+                    }
+                    if ($request->byr_id_type === 'CNIC' && !preg_match('/^[0-9]{13}$/', $value)) {
+                        $fail('Client CNIC must be exactly 13 digits (without dashes).');
+                    }
+                }
+            ],
+            'byr_address' => 'required|string',
+            'byr_province' => 'required|string',
+            'byr_account_title' => 'nullable|string|max:255',
+            'byr_account_number' => 'nullable|string|max:255',
+            'byr_reg_num' => 'nullable|string|max:255',
+            'byr_contact_num' => 'nullable|string|max:20',
+            'byr_contact_person' => 'nullable|string|max:255',
+            'byr_IBAN' => 'nullable|string|max:255',
+            'byr_acc_branch_name' => 'nullable|string|max:255',
+            'byr_acc_branch_code' => 'nullable|string|max:255',
+            'byr_logo' => 'nullable|mimes:jpg,jpeg,png,svg|max:2048',
+        ];
+        $validator = \Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            if ($isApiRequest) {
+                return errorResponse($validator->errors(), 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $validated = $validator->validated();
+
         DB::beginTransaction();
         try {
-            $validated = $request->validate([
-                'byr_name' => 'required|string|max:255',
-                'byr_type' => 'required|integer',
-                'byr_id_type' => [
-                    'nullable',
-                    'required_if:byr_type,1',
-                    'in:NTN,CNIC'
-                ],
-                'byr_ntn_cnic' => [
-                    'nullable',
-                    'required_if:byr_type,1',
-                    function ($attribute, $value, $fail) use ($request) {
-                        if ($request->byr_id_type === 'NTN' && !preg_match('/^[0-9]{7}$/', $value)) {
-                            $fail('Buyer NTN must be exactly 7 digits.');
-                        }
-                        if ($request->byr_id_type === 'CNIC' && !preg_match('/^[0-9]{13}$/', $value)) {
-                            $fail('Buyer CNIC must be exactly 13 digits (without dashes).');
-                        }
-                    }
-                ],
-                'byr_address' => 'required|string',
-                'byr_province' => 'required|string',
-                'byr_account_title' => 'nullable|string|max:255',
-                'byr_account_number' => 'nullable|string|max:255',
-                'byr_reg_num' => 'nullable|string|max:255',
-                'byr_contact_num' => 'nullable|string|max:20',
-                'byr_contact_person' => 'nullable|string|max:255',
-                'byr_IBAN' => 'nullable|string|max:255',
-                'byr_acc_branch_name' => 'nullable|string|max:255',
-                'byr_acc_branch_code' => 'nullable|string|max:255',
-                'byr_logo' => 'nullable|mimes:jpg,jpeg,png,svg|max:2048',
-            ]);
             $disk = env('FILESYSTEM_DISK', config('filesystems.default', 'uploads'));
             try {
-                Log::info('Buyer logo upload started', [
+                Log::info('Client logo upload started', [
                     'disk' => $disk,
                     'has_file' => $request->hasFile('byr_logo'),
                 ]);
@@ -107,7 +123,7 @@ class BuyerController extends Controller
                     $validated['byr_logo'] = '';
                 }
             } catch (\Throwable $e) {
-                Log::error('Error during buyer logo upload', [
+                Log::error('Error during Client logo upload', [
                     'message' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);
@@ -123,6 +139,9 @@ class BuyerController extends Controller
                 'buyers'
             );
             DB::commit();
+            if ($isApiRequest) {
+                return successResponse($buyer, 200, 'Client created successfully');
+            }
             return redirect()->route('buyers.index')
                 ->with('message', 'Client created successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -130,15 +149,21 @@ class BuyerController extends Controller
             Log::warning('Validation failed during buyer creation', [
                 'errors' => $e->errors(),
             ]);
+            if ($isApiRequest) {
+                return errorResponse($e->errors(), 422);
+            }
             return back()
                 ->withInput()
                 ->withErrors(['toast_error' =>  $e->getMessage()]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Unexpected error during buyer creation', [
+            Log::error('Unexpected error during Client creation', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+            if ($isApiRequest) {
+                return errorResponse($e->getMessage(), 500);
+            }
             return back()
                 ->withInput()
                 ->withErrors(['toast_error' =>  $e->getMessage()]);
@@ -150,43 +175,59 @@ class BuyerController extends Controller
         $buyer = Buyer::findOrFail($decryptedId);
         return view('buyers.edit', compact('buyer'));
     }
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
+        $isApiRequest = isApiRequest();
+        $rules = [
+            'byr_id' => 'required',
+            'byr_name' => 'required|string|max:255',
+            'byr_type' => 'required|integer',
+            'byr_id_type' => [
+                'nullable',
+                'required_if:byr_type,1',
+                'in:NTN,CNIC'
+            ],
+            'byr_ntn_cnic' => [
+                'nullable',
+                'required_if:byr_type,1',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->byr_id_type === 'NTN' && !preg_match('/^[0-9]{7}$/', $value)) {
+                        $fail('Client NTN must be exactly 7 digits.');
+                    }
+                    if ($request->byr_id_type === 'CNIC' && !preg_match('/^[0-9]{13}$/', $value)) {
+                        $fail('Client CNIC must be exactly 13 digits (without dashes).');
+                    }
+                }
+            ],
+            'byr_address' => 'required|string',
+            'byr_province' => 'required|string',
+            'byr_account_title' => 'nullable|string|max:255',
+            'byr_account_number' => 'nullable|string|max:255',
+            'byr_reg_num' => 'nullable|string|max:255',
+            'byr_contact_num' => 'nullable|string|max:20',
+            'byr_contact_person' => 'nullable|string|max:255',
+            'byr_IBAN' => 'nullable|string|max:255',
+            'byr_acc_branch_name' => 'nullable|string|max:255',
+            'byr_acc_branch_code' => 'nullable|string|max:255',
+            'byr_logo' => 'nullable|mimes:jpg,jpeg,png,svg|max:2048',
+        ];
+        $validator = \Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            if ($isApiRequest) {
+                return errorResponse($validator->errors(), 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $validated = $validator->validated();
+
         DB::beginTransaction();
         try {
-            $validated = $request->validate([
-                'byr_name' => 'required|string|max:255',
-                'byr_type' => 'required|integer',
-                'byr_id_type' => [
-                    'nullable',
-                    'required_if:byr_type,1',
-                    'in:NTN,CNIC'
-                ],
-                'byr_ntn_cnic' => [
-                    'nullable',
-                    'required_if:byr_type,1',
-                    function ($attribute, $value, $fail) use ($request) {
-                        if ($request->byr_id_type === 'NTN' && !preg_match('/^[0-9]{7}$/', $value)) {
-                            $fail('Buyer NTN must be exactly 7 digits.');
-                        }
-                        if ($request->byr_id_type === 'CNIC' && !preg_match('/^[0-9]{13}$/', $value)) {
-                            $fail('Buyer CNIC must be exactly 13 digits (without dashes).');
-                        }
-                    }
-                ],
-                'byr_address' => 'required|string',
-                'byr_province' => 'required|string',
-                'byr_account_title' => 'nullable|string|max:255',
-                'byr_account_number' => 'nullable|string|max:255',
-                'byr_reg_num' => 'nullable|string|max:255',
-                'byr_contact_num' => 'nullable|string|max:20',
-                'byr_contact_person' => 'nullable|string|max:255',
-                'byr_IBAN' => 'nullable|string|max:255',
-                'byr_acc_branch_name' => 'nullable|string|max:255',
-                'byr_acc_branch_code' => 'nullable|string|max:255',
-                'byr_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ]);
-            $buyer = Buyer::findOrFail($id);
+            $byr_id = $request->byr_id;
+            if (!$isApiRequest) {
+                $byr_id = Crypt::decryptString($request->byr_id);
+            }
+            $buyer = Buyer::findOrFail($byr_id);
             $oldData = $buyer->toArray();
             $disk = env('FILESYSTEM_DISK', config('filesystems.default', 'uploads'));
             if ($request->hasFile('byr_logo')) {
@@ -221,46 +262,108 @@ class BuyerController extends Controller
                 'buyers'
             );
             DB::commit();
+            /** Return API response */
+            if ($isApiRequest) {
+                return successResponse(
+                    data: $buyer,
+                    status: 200,
+                    message: 'Client updated successfully'
+                );
+            }
             return redirect()->route('buyers.index')
                 ->with('message', 'Client updated successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
+            if ($isApiRequest) {
+                return errorResponse(
+                    message: $e->getMessage(),
+                    status: 422
+                );
+            }
             return redirect()->back()->withErrors($e->errors())->withInput();
-            return back()
-                ->withInput()
-                ->withErrors(['toast_error' =>  $e->getMessage()]);
         } catch (\Exception $e) {
             DB::rollBack();
+            if ($isApiRequest) {
+                return errorResponse(
+                    message: $e->getMessage(),
+                    status: 500
+                );
+            }
             return back()
                 ->withInput()
                 ->withErrors(['toast_error' =>  $e->getMessage()]);
         }
     }
-
-    public function delete($id)
+    public function delete(Request $request)
     {
-        $buyer = Buyer::findOrFail($id);
-        // Prevent delete if buyer has invoices
-        if ($buyer->invoices()->exists()) {
-            // Add an error message to the error bag (for toast)
-            $validator = Validator::make([], []);
-            $validator->errors()->add('toast_error', 'This client cannot be deleted because invoices are associated with it.');
+        try {
+            $isApiRequest = isApiRequest();
+            $byr_id = $request->byr_id;
+            if (!$isApiRequest) {
+                $byr_id = Crypt::decryptString($request->byr_id);
+            }
+            $buyer = Buyer::findOrFail($byr_id);
+            // Prevent delete if buyer has invoices
+            if ($buyer->invoices()->exists()) {
+                $msg = 'This client cannot be deleted because invoices are associated with it.';
+                if ($isApiRequest) {
+                    return errorResponse($msg, 400);
+                }
+                // Web response
+                $validator = Validator::make([], []);
+                $validator->errors()->add('toast_error', $msg);
+                return redirect()
+                    ->route('buyers.index')
+                    ->withErrors($validator);
+            }
+            // Proceed with delete
+            $oldData = $buyer->toArray();
+            $buyerName = $oldData['byr_name'] ?? '';
+            $buyer->delete();
+            logActivity(
+                'delete',
+                'Deleted client: ' . $buyerName,
+                $oldData,
+                $byr_id,
+                'buyers'
+            );
+            if ($isApiRequest) {
+                return successResponse([], 200, 'Client deleted successfully');
+            }
             return redirect()
                 ->route('buyers.index')
-                ->withErrors($validator);
+                ->with('message', 'Client deleted successfully.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            if ($isApiRequest) {
+                return errorResponse('Client not found', 404);
+            }
+            return redirect()
+                ->route('buyers.index')
+                ->withErrors(['toast_error' => 'Client not found']);
+        } catch (\Exception $e) {
+            if ($isApiRequest) {
+                return errorResponse($e->getMessage(), 500);
+            }
+            return redirect()
+                ->route('buyers.index')
+                ->withErrors(['toast_error' => $e->getMessage()]);
         }
-        // Proceed with delete
-        $oldData = $buyer->toArray();
-        $buyer->delete();
-        logActivity(
-            'delete',
-            'Deleted client: ' . $oldData['byr_name'],
-            $oldData,
-            $id,
-            'buyers'
-        );
-        return redirect()
-            ->route('buyers.index')
-            ->with('message', 'Client deleted successfully.');
+    }
+    public function fetchBuyer(Request $request)
+    {
+        try {
+            $byr_id = $request->byr_id;
+            $buyer = Buyer::findOrFail($byr_id);
+            return successResponse(
+                data: $buyer,
+                status: 200,
+                message: 'Client fetched successfully'
+            );
+        } catch (\Exception $e) {
+            return errorResponse(
+                message: 'Client not found',
+                status: 404
+            );
+        }
     }
 }

@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    initRenewConfirmation();
     initDeleteConfirmation();
     initTooltips();
     initToastMessage();
@@ -16,6 +17,25 @@ function initDeleteConfirmation() {
                 confirmButtonColor: "#e3342f",
                 cancelButtonColor: "#6c757d",
                 confirmButtonText: "Yes, delete it!",
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) form.submit();
+            });
+        });
+    });
+}
+function initRenewConfirmation() {
+    document.querySelectorAll(".renew-button").forEach((button) => {
+        button.addEventListener("click", function () {
+            const form = this.closest("form");
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This action cannot be undone!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#e3342f",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Yes, Renew it!",
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) form.submit();

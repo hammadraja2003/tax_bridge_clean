@@ -45,6 +45,21 @@
                     <i class="ti ti-database"></i> Database Utilities
                 </a>
             </li> --}}
+            {{-- Packages --}}
+            <li class="no-sub">
+                <a class="{{ request()->routeIs('admin.packages.*') ? 'activeTab' : '' }}"
+                    href="{{ route('admin.packages.index') }}">
+                    <i class="ti ti-package"></i> All Packages
+                </a>
+            </li>
+            {{-- Business Packages --}}
+            <li class="no-sub">
+                <a class="{{ request()->routeIs('business_packages.*') ? 'activeTab' : '' }}"
+                    href="{{ route('admin.business_packages.index') }}">
+                    <i class="ti ti-package"></i> Assign Package
+                </a>
+            </li>
+
             {{-- Logout --}}
             <li class="no-sub">
                 <form class="logout-form" id="logout-form" action="{{ route('admin.admin_logout') }}" method="POST">

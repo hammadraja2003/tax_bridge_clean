@@ -67,5 +67,6 @@
     <script src="{{ asset('assets/js/sweet_alert.js') }}"></script>
     <script src="{{ asset('assets/js/globalcustom.js') }}"></script>
     {{-- <script src="{{ asset('assets/js/admin.js') }}"></script> --}}
+    @stack('scripts')  <!-- ADD THIS LINE -->
 </body>
 </html>

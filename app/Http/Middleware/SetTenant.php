@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Http\Middleware;
+
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use App\Services\TenantManager;
 use Illuminate\Support\Facades\DB;
+
 class SetTenant
 {
     protected $tenantManager;
@@ -40,6 +43,45 @@ class SetTenant
                     'tenant_db'     => $business->db_name,
                     'bus_name'     => $business->bus_name,
                 ]);
+
+                // ===========================
+                // Active package check starts
+                // ===========================
+                $today = \Carbon\Carbon::now();
+
+                $activePackage = DB::connection('master')
+                    ->table('business_packages')
+                    ->where('business_id', $business->bus_config_id)
+                    ->where('is_active', true)
+                    ->where(function ($query) use ($today) {
+                        $query->where(function ($q) use ($today) {
+                            $q->where('is_trial', false)
+                                ->where('end_date', '>=', $today);
+                        })
+                            ->orWhere(function ($q) use ($today) {
+                                $q->where('is_trial', true)
+                                    ->where('trial_end_date', '>=', $today);
+                            });
+                    })
+                    ->first();
+
+                if (!$activePackage) {
+                    Auth::logout();
+                    return redirect()->route('login')->withErrors([
+                        'db' => 'Your business does not have an active package. Please contact admin.'
+                    ]);
+                } else {
+                    session([
+                        'is_trial'     => $activePackage->is_trial,
+                        'trial_end_date'     => $activePackage->trial_end_date,
+                        'start_date'     => $activePackage->start_date,
+                        'end_date'     => $activePackage->end_date,
+                    ]);
+                }
+                // ===========================
+                // Active package check ends
+                // ===========================
+
             }
         }
         return $next($request);

@@ -13,6 +13,9 @@ class ActivityLogController extends Controller
             $currentHash = hash('sha256', json_encode($log->data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK));
             $log->hash_changed = $currentHash !== $log->data_hash;
         }
+        if (isApiRequest()) {
+            return paginatedResponse($logs, 'Activity Logs Data Fetched');
+        }
         return view('activity_logs.index', compact('logs'));
     }
 }

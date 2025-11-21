@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Services;
+
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\BusinessConfiguration;
+
 class FbrInvoiceService
 {
     protected string $env; // sandbox or production
@@ -17,6 +20,13 @@ class FbrInvoiceService
     }
     public function validateInvoice(array $payload): array
     {
+        // return $this->callFbrApi(
+        //     endpoint: $this->env === 'production'
+        //         ? 'validateinvoicedata'
+        //         : 'validateinvoicedata_sb',
+        //     method: 'POST',
+        //     payload: $payload
+        // );
         try {
             $url = $this->baseUrl . ($this->env === 'production' ? 'validateinvoicedata' : 'validateinvoicedata_sb');
             $jsonData = json_encode($payload);
@@ -37,6 +47,7 @@ class FbrInvoiceService
                 ),
             ));
             $response = curl_exec($curl);
+            Log::info('FBR raw response', ['res' => $response]);
             curl_close($curl);
             $data = json_decode($response, true);
             $dated = $data['dated'] ?? null;
@@ -70,6 +81,13 @@ class FbrInvoiceService
     }
     public function postInvoice(array $payload): array
     {
+        // return $this->callFbrApi(
+        //     endpoint: $this->env === 'production'
+        //         ? 'postinvoicedata'
+        //         : 'postinvoicedata_sb',
+        //     method: 'POST',
+        //     payload: $payload
+        // );
         try {
             $url = $this->baseUrl . ($this->env === 'production' ? 'postinvoicedata' : 'postinvoicedata_sb');
             $jsonData = json_encode($payload);
@@ -127,6 +145,133 @@ class FbrInvoiceService
             ];
         }
     }
+
+    private function callFbrApi(
+        string $endpoint,
+        string $method = 'POST',
+        array $payload = [],
+        int $retry = 2,
+        int $timeout = 30
+    ): array {
+
+        $url = rtrim($this->baseUrl, '/') . '/' . ltrim($endpoint, '/');
+
+        $lastError = null;
+
+        for ($attempt = 1; $attempt <= $retry; $attempt++) {
+
+            try {
+
+                $curl = curl_init();
+                $options = [
+                    CURLOPT_URL            => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT        => $timeout,
+                    CURLOPT_ENCODING       => '',
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_HTTPHEADER     => [
+                        'Authorization: Bearer ' . $this->token,
+                        'Content-Type: application/json',
+                        'Accept: application/json',
+                    ],
+                ];
+
+                if (strtoupper($method) === 'POST') {
+                    $options[CURLOPT_CUSTOMREQUEST] = 'POST';
+                    $options[CURLOPT_POSTFIELDS]   = json_encode($payload);
+                }
+
+                curl_setopt_array($curl, $options);
+
+                $response  = curl_exec($curl);
+                $httpCode  = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($curl);
+
+                curl_close($curl);
+
+                // ✅ Logging
+                Log::info("FBR Attempt {$attempt}", [
+                    'url'      => $url,
+                    'method'   => $method,
+                    'payload'  => $payload,
+                    'response' => $response,
+                    'httpCode' => $httpCode
+                ]);
+
+                // ❌ Transport failure
+                if ($curlError) {
+                    $lastError = "curlError: {$curlError}";
+                    sleep($attempt);
+                    continue;
+                }
+
+                // ❌ No response
+                if (!$response) {
+                    $lastError = "empty response";
+                    sleep($attempt);
+                    continue;
+                }
+
+                // ✅ Decode safely
+                $decoded = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $lastError = "Invalid JSON returned";
+                    sleep($attempt);
+                    continue;
+                }
+
+                // ✅ Success response
+                if ($httpCode >= 200 && $httpCode < 300) {
+                    return [
+                        'success'   => true,
+                        'statusCode' => $httpCode,
+                        'data'      => $decoded,
+                        'error'     => null
+                    ];
+                }
+
+                // ❌ 401 — No retry
+                if ($httpCode === 401) {
+                    return [
+                        'success'   => false,
+                        'statusCode' => $httpCode,
+                        'error'     => 'Unauthorized — Token expired/invalid',
+                        'data'      => $decoded
+                    ];
+                }
+
+                // ✅ Retry if server error
+                if ($httpCode >= 500) {
+                    $lastError = "Server error: {$httpCode}";
+                    sleep($attempt);
+                    continue;
+                }
+
+                // ❌ Client error — stop
+                return [
+                    'success'   => false,
+                    'statusCode' => $httpCode,
+                    'error'     => $decoded['message'] ?? "HTTP error {$httpCode}",
+                    'data'      => $decoded
+                ];
+            } catch (\Exception $ex) {
+                $lastError = $ex->getMessage();
+                sleep($attempt);
+            }
+        }
+
+        // ❌ Failed after retries
+        return [
+            'success'   => false,
+            'statusCode' => null,
+            'error'     => $lastError ?? 'Unknown error',
+            'data'      => null
+        ];
+    }
+
     protected function headers(): array
     {
         return [
@@ -149,35 +294,35 @@ class FbrInvoiceService
 
     protected function get(string $endpoint, array $query = []): array
     {
-    try {
-        $url = "https://gw.fbr.gov.pk/pdi/v1/" . ltrim($endpoint, '/');
+        try {
+            $url = "https://gw.fbr.gov.pk/pdi/v1/" . ltrim($endpoint, '/');
 
-        $response = Http::withHeaders($this->headers())
-            ->timeout(30)
-            ->get($url, $query);
+            $response = Http::withHeaders($this->headers())
+                ->timeout(30)
+                ->get($url, $query);
 
-        if ($response->failed()) {
-            Log::error("FBR API GET failed: {$url}", [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
+            if ($response->failed()) {
+                Log::error("FBR API GET failed: {$url}", [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                return [
+                    'success' => false,
+                    'error' => $response->body(),
+                ];
+            }
+
+            return [
+                'success' => true,
+                'data' => $response->json(),
+            ];
+        } catch (\Exception $e) {
+            Log::error("FBR API GET exception: " . $e->getMessage());
             return [
                 'success' => false,
-                'error' => $response->body(),
+                'error' => $e->getMessage(),
             ];
         }
-
-        return [
-            'success' => true,
-            'data' => $response->json(),
-        ];
-    } catch (\Exception $e) {
-        Log::error("FBR API GET exception: " . $e->getMessage());
-        return [
-            'success' => false,
-            'error' => $e->getMessage(),
-        ];
-    }
     }
 
     public function getItemDescCodes(): array
@@ -282,5 +427,4 @@ class FbrInvoiceService
             ];
         }
     }
-
 }

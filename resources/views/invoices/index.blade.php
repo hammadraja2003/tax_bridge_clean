@@ -59,8 +59,16 @@
                         </div>
                         <div id="myTable">
                             <div class="list-table-header d-flex justify-content-between align-items-center p-3">
-                                <a href="{{ route('invoices.create') }}" class="btn btn-primary"><i
-                                        class="fa-solid fa-plus fa-fw"></i>New Invoice</a>
+                                {{-- <a href="{{ route('invoices.create') }}" class="btn btn-primary"><i
+                                        class="fa-solid fa-plus fa-fw"></i>New Invoice</a> --}}
+
+                                <form action="{{ route('invoices.create') }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa-solid fa-plus fa-fw"></i> New Invoice
+                                    </button>
+                                </form>
+
                                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                                     aria-hidden="true">
                                 </div>
@@ -83,6 +91,7 @@
                                             <th class="w-50">Invoice Status</th>
                                             <th class="w-50">Excl. Tax</th>
                                             <th class="w-50">Incl. Tax</th>
+                                            <th class="w-50">Env</th>
                                             <th class="extra-column">Type</th>
                                             <th class="extra-column">FBR Env</th>
                                             <th class="extra-column">Seller</th>
@@ -122,7 +131,7 @@
                                                 </td>
                                                 <td class="">{{ number_format($inv->totalAmountIncludingTax, 2) }}
                                                 </td>
-
+                                                <td class="employee"> {{ $inv->invoice_created_from_web_api == 1 ? 'Web' : 'Other Device' }}</td>
                                                 <td class="employee extra-column">{{ $inv->invoice_type }}</td>
                                                 <td class="email extra-column">{{ $inv->fbr_environment ?? '-' }}</td>
 
@@ -169,14 +178,25 @@
                                                         <i class="fa-solid fa-print fa-fw"></i>
                                                     </a>
                                                     @if ($inv->invoice_status === 1)
-                                                        <a href="{{ route('invoices.edit', Crypt::encryptString($inv->invoice_id)) }}"
+                                                        {{-- <a href="{{ route('invoices.edit', Crypt::encryptString($inv->invoice_id)) }}"
                                                             class="btn btn-xs btn-outline-warning"
                                                             data-bs-toggle="tooltip" title="Edit Invoice">
                                                             <i class="fa-solid fa-pen-to-square"></i>
-                                                        </a>
+                                                        </a> --}}
 
-                                                        <form
-                                                            action="{{ route('invoices.delete', $inv->invoice_id) }}"
+                                                        <form action="{{ route('invoices.edit') }}" method="POST"
+                                                            class="d-inline">
+                                                            @csrf
+                                                            <input type="hidden" name="invoice_id"
+                                                                value="{{ \Illuminate\Support\Facades\Crypt::encryptString($inv->invoice_id) }}" />
+                                                            <button type="submit"
+                                                                class="btn btn-xs btn-outline-warning"
+                                                                title="Edit Invoice">
+                                                                <i class="fa-solid fa-pen-to-square"></i>
+                                                            </button>
+                                                        </form>
+
+                                                        {{-- <form action="{{ route('invoices.delete', $inv->invoice_id) }}"
                                                             method="POST" class="d-inline">
                                                             @csrf
                                                             @method('DELETE')
@@ -184,6 +204,18 @@
                                                                 class="btn btn-outline-danger btn-xs delete-button"
                                                                 title="Delete Invoice">
                                                                 <i class="ti ti-trash f-s-18"></i>
+                                                            </button>
+                                                        </form> --}}
+
+                                                        <form action="{{ route('invoices.delete') }}" method="POST"
+                                                            class="d-inline">
+                                                            @csrf
+                                                            <input type="hidden" name="invoice_id"
+                                                                value="{{ \Illuminate\Support\Facades\Crypt::encryptString($inv->invoice_id) }}" />
+                                                            <button type="button"
+                                                                class="btn btn-xs btn-outline-danger delete-button"
+                                                                title="Delete">
+                                                                <i class="ti ti-trash f-s-20"></i>
                                                             </button>
                                                         </form>
                                                     @endif

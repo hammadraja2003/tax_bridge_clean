@@ -23,6 +23,9 @@ class AuditLogController extends Controller
                 ($log->row_hash_new && $log->row_hash_new !== $calculatedNewHash)
             );
         }
+        if (isApiRequest()) {
+            return paginatedResponse($logs, 'Audit Logs Data Fetched');
+        }
         return view('audit_logs.index', compact('logs'));
     }
     public function show($encryptedId)
@@ -30,7 +33,7 @@ class AuditLogController extends Controller
         try {
             $id = Crypt::decrypt($encryptedId);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            abort(404); 
+            abort(404);
         }
         $log = AuditLog::findOrFail($id);
         $calculatedOldHash = $log->old_data ? hash('sha256', json_encode($log->old_data)) : null;

@@ -1,79 +1,96 @@
 @extends('layouts.admin')
 @section('content')
+    <style nonce="{{ $nonce }}">
+        .card.project-cards {
+            cursor: pointer;
+        }
+    </style>
     <div class="container-fluid">
         <div class="row project_dashboard">
             <!-- Cards -->
             <div class="col-md-6 col-lg-3">
                 <div class="card project-cards">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h6>Total Clients
-                                <!-- <span class="badge text-success">+3.1%</span> -->
-                            </h6>
-                            <div class="d-flex align-items-center gap-2 mt-2">
-                                <h4 class="text-success f-w-600 counting" data-count="{{ $totalClients }}">{{ $totalClients }}
-                                </h4>
-                                <!-- <p class="m-0 text-secondary">All Clients This Month</p> -->
+                    <a href="{{ route('buyers.index') }}" target="_blank">
+                        <div class="card-body d-flex justify-content-between">
+                            <div>
+                                <h6>Total Clients
+                                </h6>
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <h4 class="text-success f-w-600 counting" data-count="{{ $totalClients }}">
+                                        {{ $totalClients }}
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="project-card-icon project-success bg-light-success h-55 w-55 d-flex-center b-r-100">
+                                <i class="ti ti-users f-s-30 mb-1"></i>
                             </div>
                         </div>
-                        <div class="project-card-icon project-success bg-light-success h-55 w-55 d-flex-center b-r-100">
-                            <i class="ti ti-users f-s-30 mb-1"></i>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
                 <div class="card project-cards">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h6>Total Invoices
-                                <!-- <span class="badge text-warning">0.20%</span> -->
-                            </h6>
-                            <div class="d-flex align-items-center gap-2 mt-2">
-                                <h4 class=" text-warning f-w-600 counting" data-count="{{ $totalInvoices }}">
-                                    {{ $totalInvoices }}</h4>
-                                <!-- <p class="m-0 text-secondary">Total Invoices This Month</p> -->
+                    <a href="{{ route('invoices.index') }}" target="_blank">
+                        <div class="card-body d-flex justify-content-between">
+                            <div>
+                                <h6>Total Invoices
+                                    <!-- <span class="badge text-warning">0.20%</span> -->
+                                </h6>
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <h4 class=" text-warning f-w-600 counting" data-count="{{ $totalInvoices }}">
+                                        {{ $totalInvoices }}</h4>
+                                    <!-- <p class="m-0 text-secondary">Total Invoices This Month</p> -->
+                                </div>
+                            </div>
+                            <div
+                                class="project-card-icon project-secondary bg-light-warning h-55 w-55 d-flex-center b-r-100">
+                                <i class="ti ti-file-invoice f-s-30 mb-1"></i>
                             </div>
                         </div>
-                        <div class="project-card-icon project-secondary bg-light-warning h-55 w-55 d-flex-center b-r-100">
-                            <i class="ti ti-file-invoice f-s-30 mb-1"></i>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="card project-cards">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h6>Total FBR Posted<span class="badge text-success">{{ $fbrpostedPercentage }}%</span></h6>
-                            <div class="d-flex align-items-center gap-2 mt-2">
-                                <h4 class="text-success f-w-600 counting" data-count="{{ $fbrPostedInvoices }}">
-                                    {{ $fbrPostedInvoices }}</h4>
-                                <!-- <p class="m-0 text-secondary">Posted This Month</p> -->
+                <div class="card project-cards" id="fbr_posted">
+                    <form action="{{ route('invoices.filter') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="is_posted_to_fbr" value="1" />
+                        <div class="card-body d-flex justify-content-between">
+                            <div>
+                                <h6>Total FBR Posted<span class="badge text-success">{{ $fbrpostedPercentage }}%</span></h6>
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <h4 class="text-success f-w-600 counting" data-count="{{ $fbrPostedInvoices }}">
+                                        {{ $fbrPostedInvoices }}</h4>
+                                    <!-- <p class="m-0 text-secondary">Posted This Month</p> -->
+                                </div>
+                            </div>
+                            <div class="project-card-icon project-success bg-light-success h-55 w-55 d-flex-center b-r-100">
+                                <i class="ti ti-file-upload f-s-30 mb-1"></i>
                             </div>
                         </div>
-                        <div class="project-card-icon project-success bg-light-success h-55 w-55 d-flex-center b-r-100">
-                            <i class="ti ti-file-upload f-s-30 mb-1"></i>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
-                <div class="card project-cards">
-                    <div class="card-body d-flex justify-content-between">
-                        <div>
-                            <h6 class="text-secondary">Total Draft <span
-                                    class="badge text-danger">{{ $draftPercentage }}%</span></h6>
-                            <div class="d-flex align-items-center gap-2 mt-2">
-                                <h4 class=" text-danger f-w-600 counting inline" data-count={{ $draftInvoices }}>
-                                    {{ $draftInvoices }}</h4>
-                                <!-- <p class="m-0 text-secondary">Finished This Month</p> -->
+                <div class="card project-cards" id="draft">
+                    <form action="{{ route('invoices.filter') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="is_posted_to_fbr" value="0" />
+                        <div class="card-body d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-secondary">Total Draft <span
+                                        class="badge text-danger">{{ $draftPercentage }}%</span></h6>
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <h4 class=" text-danger f-w-600 counting inline" data-count={{ $draftInvoices }}>
+                                        {{ $draftInvoices }}</h4>
+                                    <!-- <p class="m-0 text-secondary">Finished This Month</p> -->
+                                </div>
+                            </div>
+                            <div class="project-card-icon project-primary bg-light-danger h-60 w-60 d-flex-center b-r-100">
+                                <i class="ti ti-browser-check f-s-36 mb-1"></i>
                             </div>
                         </div>
-                        <div class="project-card-icon project-primary bg-light-danger h-60 w-60 d-flex-center b-r-100">
-                            <i class="ti ti-browser-check f-s-36 mb-1"></i>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
             <!-- Cards end -->
@@ -147,6 +164,19 @@
                 percentages: @json($topServicePercentagesRevenue),
             };
         </script>
+
+        <script nonce="{{ $nonce }}">
+            ['fbr_posted', 'draft'].forEach(id => {
+                const card = document.getElementById(id);
+                if (card) {
+                    card.addEventListener('click', () => {
+                        const form = card.querySelector('form');
+                        if (form) form.submit();
+                    });
+                }
+            });
+        </script>
+
         <!-- js-->
         <script src="{{ asset('assets/js/pie_charts.js') }}"></script>
         <script src="{{ asset('assets/js/column.js') }}"></script>

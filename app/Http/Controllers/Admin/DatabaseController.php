@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +9,6 @@ use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\BusinessConfiguration;
 use Exception;
-
 class DatabaseController extends Controller
 {
     public function showCloneForm()
@@ -63,18 +60,15 @@ class DatabaseController extends Controller
                 ");
                 }
             }
-
             // ✅ Get user + business details
             $user = User::select('users.*', 'business_configurations.db_name')
                 ->join('business_configurations', 'business_configurations.bus_config_id', '=', 'users.tenant_id')
                 ->where('business_configurations.db_name', $newDb)
                 ->first();
-
             if (!$user) {
                 return back()->with('error', "User not found for DB: {$newDb}");
             }
             $loginUrl = route('login');
-
             try {
                 Mail::to($user->email)->send(
                     new UserCredentialsMail(
@@ -87,8 +81,6 @@ class DatabaseController extends Controller
                 Log::error("❌ Mail sending failed: " . $e->getMessage());
                 return back()->with('error', 'Created but email failed');
             }
-
-
             return back()->with('success', "Database `$newDb` cloned successfully from `$sourceDb` (schema + triggers only, no data).");
         } catch (\Exception $e) {
             DB::statement("DROP DATABASE IF EXISTS `$newDb`");

@@ -22,52 +22,51 @@ switch (true) {
 }
 Dotenv::createImmutable($basePath, $envFile)->safeLoad();
 $app = Application::configure(basePath: $basePath)
-
     ->withRouting(
         using: function () {
-            // --- Standard web routes (middleware:web) ---
             require __DIR__ . '/../routes/web.php';
-
-            // --- Auth routes (login/register/forgot etc) ---
             if (file_exists(__DIR__ . '/../routes/auth.php')) {
                 require __DIR__ . '/../routes/auth.php';
             }
-
-            // --- Admin routes ---
             if (file_exists(__DIR__ . '/../routes/admin.php')) {
                 require __DIR__ . '/../routes/admin.php';
             }
-
-            // --- API routes (optional, no web middleware) ---
             if (file_exists(__DIR__ . '/../routes/api.php')) {
                 require __DIR__ . '/../routes/api.php';
             }
-
-            // --- Console routes ---
-            if (file_exists(__DIR__ . '/../routes/console.php')) {
-                require __DIR__ . '/../routes/console.php';
-            }
         },
-        web: __DIR__ . '/../routes/web.php',  // default web route fallback
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
-
-
-
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'security.headers'   => \App\Http\Middleware\SecurityHeadersMiddleware::class,
             'set.tenant'         => \App\Http\Middleware\SetTenant::class,
             'business.configured' => \App\Http\Middleware\EnsureBusinessConfigured::class,
-            // 'secret.key'         => \App\Http\Middleware\SecretKeyMiddleware::class,
             'admin.auth' => \App\Http\Middleware\RedirectIfNotAdmin::class,
+            'tenant.api' => \App\Http\Middleware\SetTenantForApi::class,
+            'check.token.expire' => \App\Http\Middleware\CheckTokenExpire::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
+    // ->withExceptions(function (Exceptions $exceptions) {
+    //     //
+    // })
+    ->withExceptions(function (Illuminate\Foundation\Configuration\Exceptions $exceptions) {
+        $exceptions->render(function (Throwable $e, $request) {
+            if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                if ($request->is('api/*')) {
+                    return response()->json([
+                        'success' => false,
+                        'code'    => 401,
+                        'message' => 'Unauthenticated',
+                    ], 401);
+                }
+                return redirect()->guest(route('login'));
+            }
+            return null;
+        });
     })
     ->create();
-// ✅ If you need to know which .env file was used, just uncommetn below this:
-// file_put_contents($basePath . '/storage/logs/env_boot.log', date('Y-m-d H:i:s') . " => Loaded {$envFile}\n", FILE_APPEND);
 return $app;

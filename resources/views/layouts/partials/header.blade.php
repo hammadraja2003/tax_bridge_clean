@@ -16,6 +16,23 @@
                                         <span class="badge bg-success me-2">Production Environment</span>
                                     @endif
                                 </div>
+                                @php
+                                    use Carbon\Carbon;
+                                    $trialDaysLeft = 0;
+                                    $isTrial = session('is_trial');
+                                    $trialEndDate = session('trial_end_date');
+                                    if ($isTrial && $trialEndDate) {
+                                        $today = Carbon::now();
+                                        $trialEnd = Carbon::parse($trialEndDate);
+                                        $trialDaysLeft = (int) $today->diffInDays($trialEnd, false);
+                                        if ($trialDaysLeft < 0) {
+                                            $trialDaysLeft = 0;
+                                        }
+                                    }
+                                @endphp
+                                @if ($trialDaysLeft > 0)
+                                    <span class="badge bg-warning me-2">Trial Days Left: {{ $trialDaysLeft }}</span>
+                                @endif
                             </div>
                             <div class="col-6 d-flex align-items-center justify-content-end header-right">
                                 <ul class="d-flex align-items-center">
@@ -71,7 +88,8 @@
                                                 @endif
                                                 <li class="app-divider-v dotted py-1"></li>
                                                 <li>
-                                                    <form class="logout-form" method="POST" action="{{ route('logout') }}">
+                                                    <form class="logout-form" method="POST"
+                                                        action="{{ route('logout') }}">
                                                         @csrf
                                                         <button type="submit"
                                                             class="dropdown-item d-flex align-items-center text-danger border-0 bg-transparent w-100 text-start">

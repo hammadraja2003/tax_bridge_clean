@@ -15,6 +15,9 @@ class FbrPostErrorController extends Controller
     public function showErrors()
     {
         $fbr_errors = FbrPostError::orderByDesc('id')->paginate(10);
+        if (isApiRequest()) {
+            return paginatedResponse($fbr_errors, 'FBR Errors Data Fetched');
+        }
         return view('invoices.fbr_post_error', compact('fbr_errors'));
     }
 }

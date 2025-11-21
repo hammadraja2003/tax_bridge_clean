@@ -24,8 +24,6 @@ class DashboardController extends Controller
         $draftPercentage = $totalInvoices > 0
             ? round(($draftInvoices / $totalInvoices) * 100, 2)
             : 0;
-
-
         // Top Five Clients - Revenue Basis
         $topClients = Buyer::select('byr_id', 'byr_name')
             ->withSum(['invoices as total' => function ($query) use ($fbrEnv) {
@@ -42,7 +40,6 @@ class DashboardController extends Controller
         $topClientPercentages = $topClientTotals->map(function ($val) use ($totalSum) {
             return $totalSum > 0 ? round(($val / $totalSum) * 100, 2) : 0;
         });
-
         // Top Five Services - Revenue Basis
         $topServicesRevenue = Item::select('items.item_id', 'items.item_description')
             ->join('invoice_details', 'invoice_details.item_id', '=', 'items.item_id')
@@ -60,9 +57,6 @@ class DashboardController extends Controller
         $topServicePercentagesRevenue = $topServiceTotalsRevenue->map(function ($val) use ($totalRevenueSum) {
             return $totalRevenueSum > 0 ? round(($val / $totalRevenueSum) * 100, 2) : 0;
         });
-
-
-
         // Month-wise Tax Details
         $monthlyTaxData = Invoice::selectRaw('
             MONTH(invoice_date) as month,
@@ -87,8 +81,6 @@ class DashboardController extends Controller
             $furtherTaxData[$index] = (float) $data->totalFurtherTax;
             $extraTaxData[$index] = (float) $data->totalExtraTax;
         }
-
-
         // Month-wise Invoice Details
         $monthlyInvoiceStatusData = Invoice::selectRaw('
             MONTH(invoice_date) as month,
@@ -108,10 +100,6 @@ class DashboardController extends Controller
             $monthlyDraftCounts[$index] = (int) $data->draft_count;
             $monthlyPostedCounts[$index] = (int) $data->posted_count;
         }
-
-
-
-
         $months = collect(range(1, 12))->map(function ($month) {
             return Carbon::create()->month($month)->format('M');
         });
@@ -143,8 +131,7 @@ class DashboardController extends Controller
                 ],
             ],
         ];
-
-        return view('dashboard', compact(
+        $response = compact(
             'totalClients',
             'totalInvoices',
             'fbrPostedInvoices',
@@ -164,6 +151,10 @@ class DashboardController extends Controller
             'topServiceTotalsRevenue',
             'topServicePercentagesRevenue',
             'invoiceMonthlyStats',
-        ));
+        );
+        if (isApiRequest()) {
+            return successResponse($response, 200, 'Dashboard Data Fetched');
+        }
+        return view('dashboard', $response);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
@@ -7,6 +8,11 @@ use App\Models\ActivityLog;
 use App\Models\BusinessConfiguration;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\BusinessFeatureUsage;
+use App\Models\BusinessPackage;
+
 if (!function_exists('logError')) {
     function logError(array $context = [])
     {
@@ -33,10 +39,10 @@ if (!function_exists('logActivity')) {
         $userId = $user ? $user->id : null;
         $userName = $user ? $user->name : 'guest';
         $ip = Request::ip();
-        $deviceId = Request::header('device-id') ?? 'unknown';        
+        $deviceId = Request::header('device-id') ?? 'unknown';
         $dataJson = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_NUMERIC_CHECK);
         $newHash = hash('sha256', $dataJson);
-        $hashChanged = ($action !== 'update'); 
+        $hashChanged = ($action !== 'update');
         $oldHash = null;
         if ($action === 'update' && $recordId && $tableName) {
             $oldLog = ActivityLog::where('record_id', $recordId)
@@ -167,5 +173,190 @@ if (!function_exists('dynamicTemporaryUrl')) {
             );
         }
         return Storage::disk($disk)->url($path);
+    }
+}
+if (!function_exists('getScenarioOptions')) {
+    /**
+     * Get business scenarios for API as JSON-friendly array
+     *
+     * @param string|null $selectedCode
+     * @return array
+     */
+    function getScenarioOptions($businessId , $selectedCode = null)
+    {
+        // $businessId = session('bus_config_id');
+
+        if (!$businessId) {
+            return [];
+        }
+
+        $scenarios = DB::connection('master')
+            ->table('business_scenarios as bs')
+            ->join('sandbox_scenarios as ss', 'bs.scenario_id', '=', 'ss.scenario_id')
+            ->where('bs.bus_config_id', $businessId)
+            ->orderBy('ss.scenario_code', 'asc')
+            ->get();
+
+        $result = [];
+
+        foreach ($scenarios as $scenario) {
+            $result[] = [
+                'scenario_code' => $scenario->scenario_code,
+                'scenario_description' => $scenario->scenario_description,
+                'sale_type' => $scenario->sale_type ?? null,
+                'selected' => ($selectedCode === $scenario->scenario_code),
+            ];
+        }
+
+        return $result;
+    }
+}
+if (!function_exists('successResponse')) {
+    function successResponse($data = [], $status = 200, $message = '', $isDecoded = 0, $isPaginated = false)
+    {
+        $isDecoded = env('API_RESPONSE_ENC', $isDecoded);
+        // Return plain JSON if encoding disabled
+        if ($isDecoded == 0) {
+            return response()->json([
+                'success' => true,
+                'code'    => $status,
+                'message' => $message,
+                'data'    => $data,
+                'enc'     => 0,
+                'isPaginated' => $isPaginated,
+            ], $status);
+        }
+        // Convert array/object to JSON string
+        $jsonData = is_array($data) || is_object($data)
+            ? json_encode($data)
+            : $data;
+        // Base64 encode
+        $encodedData = base64_encode($jsonData);
+        return response()->json([
+            'success' => true,
+            'code'    => $status,
+            'message' => $message,
+            'data'    => $encodedData,
+            'enc'     => 1,
+            'isPaginated' => $isPaginated,
+        ], $status);
+    }
+}
+if (!function_exists('errorResponse')) {
+    function errorResponse($message = 'An error occurred', $status = 400)
+    {
+        return response()->json([
+            'success' => false,
+            'code'    => $status,
+            'message' => $message,
+        ], $status);
+    }
+}
+if (!function_exists('isApiRequest')) {
+    function isApiRequest(): bool
+    {
+        return request()->is('api/*');
+    }
+}
+if (!function_exists('paginatedResponse')) {
+    function paginatedResponse(LengthAwarePaginator $paginator, string $message = '', int $status = 200)
+    {
+        $data = [
+            'data' => $paginator->items(),               // Actual paginated items
+            'current_page' => $paginator->currentPage(),
+            'last_page' => $paginator->lastPage(),
+            'per_page' => $paginator->perPage(),
+            'total' => $paginator->total()
+        ];
+        return successResponse($data, $status, $message, env('API_RESPONSE_ENC'), true);
+    }
+}
+
+if (!function_exists('checkFeatureLimit')) {
+    /**
+     * Check feature availability for a tenant.
+     *
+     * @param int $tenantId
+     * @param string $featureKey
+     * @param bool $increment Whether to increment usage (default false)
+     * @param int $incrementCount Number to increment usage by (default 1)
+     * @return array
+     */
+    function checkFeatureLimit(int $tenantId, string $featureKey, bool $increment = false, int $incrementCount = 1): array
+    {
+        $today = Carbon::now();
+
+        // Get active package (trial or normal)
+        $package = BusinessPackage::where('business_id', $tenantId)
+            ->where('is_active', true)
+            ->where(function ($query) use ($today) {
+                $query->where(function ($q) use ($today) {
+                    $q->where('is_trial', false)
+                        ->where('end_date', '>=', $today);
+                })
+                    ->orWhere(function ($q) use ($today) {
+                        $q->where('is_trial', true)
+                            ->where('trial_end_date', '>=', $today);
+                    });
+            })
+            ->first();
+
+        if (!$package) {
+            return [
+                'ok' => false,
+                'message' => 'No active package for this business.',
+                'usage' => null,
+                'package' => null,
+            ];
+        }
+
+        // Fetch or create usage row for the feature
+        // $usage = BusinessFeatureUsage::firstOrCreate(
+        //     [
+        //         'business_package_id' => $package->business_packages_id,
+        //         'feature_key' => $featureKey,
+        //     ],
+        //     [
+        //         'business_id' => $tenantId,
+        //         'period_start_date' => $package->start_date,
+        //         'period_end_date' => $package->end_date,
+        //         'used_count' => 0
+        //     ]
+        // );
+        $usage = BusinessFeatureUsage::firstOrCreate(
+            [
+                'business_package_id' => $package->business_packages_id,
+                'feature_key' => $featureKey,
+                'period_start_date' => $package->start_date,
+                'period_end_date' => $package->end_date,
+            ],
+            [
+                'business_id' => $tenantId,
+                'used_count' => 0
+            ]
+        );
+
+
+        // Check limit
+        if ($usage->limit_value !== null && $usage->used_count + ($increment ? $incrementCount : 0) > $usage->limit_value) {
+            return [
+                'ok' => false,
+                'message' => ucfirst($featureKey) . ' limit exceeded for your package.',
+                'usage' => $usage,
+                'package' => $package,
+            ];
+        }
+
+        // Increment usage only if requested
+        if ($increment) {
+            $usage->increment('used_count', $incrementCount);
+        }
+
+        return [
+            'ok' => true,
+            'message' => ucfirst($featureKey) . ' is available.',
+            'usage' => $usage,
+            'package' => $package,
+        ];
     }
 }
